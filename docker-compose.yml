@@ -1,0 +1,83 @@
+version: '3'
+
+services:
+
+# -------------------
+# API service for LLM
+# -------------------
+  api:
+    image: wasata/api
+    restart: always
+    container_name: wasata_api
+    env_file:
+      - .env
+    ports:
+      - 8888:8888
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://api:8888/health"]
+      interval: 15s
+      retries: 5
+    depends_on:
+      - dev-postgres
+    networks:
+      - wasata-bridge
+    volumes:
+      - ./app/api:/app/api
+
+
+# -------------------------
+# Postgres database service
+# -------------------------
+  dev-postgres:
+    image: wasata/dev-postgres
+    container_name: wasata_db
+    env_file:
+      - .env
+    ports:
+      - 5432:5432
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 5s
+      retries: 5
+    networks:
+      - wasata-bridge
+
+
+# --------------------------------
+# PgAdmin database browser service
+# --------------------------------
+  pgadmin:
+    container_name: wasata_pgadmin
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgadmin4@pgadmin.org}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    volumes:
+       - ./mnt/pgadmin:/var/lib/pgadmin
+    ports:
+      - "${PGADMIN_PORT:-5050}:80"
+    restart: unless-stopped
+    depends_on:
+      - dev-postgres
+    networks:
+      - wasata-bridge
+
+
+# ----------------------------
+# Container log viewer service
+# ----------------------------
+  dozzle:
+    container_name: wasata_dozzle
+    image: amir20/dozzle:latest
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - 9999:8080
+    depends_on:
+      - dev-postgres
+
+# bridge network for all containers
+networks:
+  wasata-bridge:
+    driver: bridge

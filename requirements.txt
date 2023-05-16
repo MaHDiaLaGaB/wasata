@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+SQLAlchemy
+alembic
+sqlmodel
+requests
+python-dotenv
+httpx
+psycopg2-binary
+email-validator
+
