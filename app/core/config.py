@@ -1,6 +1,6 @@
 import os
 from dotenv import load_dotenv
-from pydantic import BaseSettings
+from pydantic import BaseSettings, condecimal
 
 load_dotenv()
 
@@ -8,7 +8,6 @@ load_dotenv()
 class Config(BaseSettings):
     ENVIRONMENT: str = os.getenv("ENVIRONMENT", "dev")
     API_PORT: int = int(os.getenv("API_PORT", 8000))
-    DATABASE_URL: str = os.getenv("DATABASE_URL")
     SECRET_KEY: str = os.getenv("SECRET_KEY")
     POSTGRES_USER: str = os.getenv("POSTGRES_USER")
     POSTGRES_PASSWORD: str = os.getenv("POSTGRES_PASSWORD")

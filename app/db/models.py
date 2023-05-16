@@ -1,9 +1,6 @@
 """
 Contains your database models (e.g., SQLAlchemy ORM models) and their relationships.
 """
-from functools import partial
-import re
-import os
 from enum import Enum
 import logging
 from dotenv import load_dotenv
@@ -20,38 +17,16 @@ from sqlmodel import (
     Field,
 )
 
+from app.core.config import config
+from app.utils.helper_function import snake_case
+from app.db.schemas import StatusEntity
+
 load_dotenv()
 
 logger = logging.getLogger(__name__)
 
-_snake_1 = partial(re.compile(r'(.)((?<![^A-Za-z])[A-Z][a-z]+)').sub, r'\1_\2')
-_snake_2 = partial(re.compile(r'([a-z0-9])([A-Z])').sub, r'\1_\2')
 
-# Database configurations
-POSTGRES_USER = os.getenv("POSTGRES_USER")
-POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD")
-DB_HOST = os.getenv("DB_HOST", "localhost")
-DB_PORT = os.getenv("DB_PORT", 5432)
-DB_NAME = os.getenv("DB_NAME")
-
-SU_DSN = (
-    f"postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
-)
-
-class StatusEntity(str, Enum):
-    UNVERIFIED = "unverified"
-    ACTIVE = "active"
-    INACTIVE = "inactive"
-    DELETED = "deleted"
-    BANNED = "banned"
-    BLOCKED = "blocked"
-
-
-# ---------------------------------------
-# Convert to snake casing (for DB models)
-# ---------------------------------------
-def snake_case(string: str) -> str:
-    return _snake_2(_snake_1(string)).casefold()
+SU_DSN = config.DATABASE_URI
 
 
 class BaseModel(SQLModel):
@@ -104,7 +79,7 @@ class BaseModel(SQLModel):
 # ==========================
 # Tracking the user activity
 # ==========================
-class MyModel(BaseModel, table=True):
+class User(BaseModel, table=True):
     id: int = Field(default=None, primary_key=True)
     uuid: uuid_pkg.UUID = Field(unique=True, default_factory=uuid_pkg.uuid4)
     name: str = Field(default=None)
@@ -113,6 +88,13 @@ class MyModel(BaseModel, table=True):
     tokens: condecimal(max_digits=9, decimal_places=4) = Field(default=000.000000)
     price: condecimal(max_digits=9, decimal_places=6) = Field(default=000.000000)
     status: str = Field(default=StatusEntity.ACTIVE)
+
+
+# ==========================
+# Admin Info
+# ==========================
+# class Admin(BaseModel, table=True):
+#     pass
 
 
 # ==================
@@ -136,7 +118,7 @@ def create_db():
 def create_user_permissions():
     session = Session(get_engine(dsn=SU_DSN))
     # grant access to entire database and all tables to user DB_USER
-    query = f"GRANT ALL PRIVILEGES ON DATABASE TO {POSTGRES_USER};"
+    query = f"GRANT ALL PRIVILEGES ON DATABASE TO {config.POSTGRES_USER};"
     session.execute(query)
     session.commit()
     session.close()

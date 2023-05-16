@@ -46,3 +46,10 @@ db-create-revision:  ## create alembic revision for database
 
 db-create-migration:  ## create alembic database migrations
 	alembic --name alembic upgrade head
+
+
+check-format:
+	black --check .
+
+format-fix:
+	black .

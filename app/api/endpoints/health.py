@@ -13,7 +13,7 @@ route = APIRouter(tags=["health"])
 @route.get(HEALTH, include_in_schema=True, status_code=status.HTTP_200_OK)
 def health_check():
     try:
-        return {'status': f'ok {status.HTTP_200_OK}'}
+        return {"status": f"ok {status.HTTP_200_OK}"}
     except HTTPException as e:
         logger.error(f"can't reach the API because of: {e}")
         raise
