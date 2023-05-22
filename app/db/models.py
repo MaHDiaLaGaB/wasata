@@ -7,8 +7,6 @@ from dotenv import load_dotenv
 import uuid
 from sqlalchemy.orm import registry
 from sqlalchemy import Column, Integer, String, DateTime, Numeric
-from sqlalchemy_utils.types.email import EmailType
-from sqlalchemy_utils.types import UUIDType
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from datetime import datetime
@@ -35,9 +33,9 @@ class Users(UsersBase):
     __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True)
-    uuid = Column(UUIDType(binary=False), unique=True, default=uuid.uuid4)
+    uuid = Column(String, unique=True, default=str(uuid.uuid4))
     name = Column(String)
-    email = Column(EmailType)
+    email = Column(String, nullable=False, unique=True)
     created_at = Column(DateTime, default=datetime.now)
     tokens = Column(Numeric(9, 4))
     price = Column(Numeric(9, 4))

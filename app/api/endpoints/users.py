@@ -19,8 +19,6 @@ user_db = UserDB()
 
 @route.post(
     BUY,
-    response_model=UserGet,
-    response_model_exclude_none=True,
     status_code=HTTPStatus.CREATED,
 )
 def create(
@@ -28,7 +26,7 @@ def create(
     user: UserCreate,
     # key: str,
     user_bl: UserBL = Depends(),
-) -> UserGet:
+):
     """
     create a user, only for tests
     - *access:* secret key

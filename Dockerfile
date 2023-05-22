@@ -11,10 +11,9 @@ ENV PYTHONUNBUFFERED 1
 RUN apt-get update \
     && apt-get -y install gcc \
     && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* \
+    && pip install --upgrade pip
 
-# Updateing pip
-RUN pip install --upgrade pip
 
 # Create and activate a virtual environment
 RUN python -m venv /opt/venv
@@ -30,13 +29,11 @@ COPY dev-database /wasata/dev-database
 
 
 # Make the entrypoint script executable
-COPY entrypoint.sh /wasata/entrypoint.sh
 COPY alembic.ini /wasata/alembic.ini
 COPY .env /wasata/.env
 COPY Makefile /wasata/Makefile
+COPY entrypoint.sh wasata/entrypoint.sh
 
-# Expose the port the app runs on
-EXPOSE 8888
+RUN chmod +x wasata/entrypoint.sh
 
-# Start the application using the entrypoint script
-CMD ["bash", "-c","uvicorn app.server:app --host 0.0.0.0 --port 8888 && alembic --name alembic upgrade head"]
+ENTRYPOINT ["./wasata/entrypoint.sh"]
