@@ -44,3 +44,10 @@ class UserGet(UserCreate):
     created_at: datetime
     price: float
 
+
+class Admin(WasataBase):
+    admin_email: str
+    admin_username: str
+    admin_password: str
+    admin_price: float
+

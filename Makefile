@@ -32,7 +32,7 @@ start-api:  ## build docker images
 	echo "Building images"
 	docker build -t wasata/api .
 
-start_db:
+start-db:
 	echo "Building database"
 	cd dev-database && make image-db
 

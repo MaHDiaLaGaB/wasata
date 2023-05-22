@@ -4,8 +4,7 @@ from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
 from alembic import context
-from dotenv import load_dotenv
-import os
+
 from app.core.config import config
 
 db_url = config.DATABASE_URI

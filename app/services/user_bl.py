@@ -68,6 +68,7 @@ class UserBL:
         user = self.user_repository.get_by_email(user_create.email)
         if user is None:
             user = self.user_repository.create(user_create)
+
             return user
 
         else:

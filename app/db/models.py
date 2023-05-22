@@ -5,26 +5,16 @@ from enum import Enum
 import logging
 from dotenv import load_dotenv
 import uuid
-from sqlalchemy.orm import declared_attr, registry
+from sqlalchemy.orm import registry
 from sqlalchemy import Column, Integer, String, DateTime, Numeric
 from sqlalchemy_utils.types.email import EmailType
 from sqlalchemy_utils.types import UUIDType
-from sqlalchemy.dialects.postgresql import UUID
-from pydantic import EmailStr, condecimal
+from werkzeug.security import generate_password_hash, check_password_hash
+
 from datetime import datetime
-from typing import Union
-import uuid as uuid_pkg
-from sqlmodel import (
-    create_engine,
-    SQLModel,
-    Session,
-    select,
-    Field,
-)
 
 from app.core.config import config
-from app.utils.helper_function import snake_case
-from app.db.schemas import StatusEntity
+
 
 load_dotenv()
 
@@ -36,53 +26,6 @@ SU_DSN = config.DATABASE_URI
 users_mapper_registry = registry()
 
 UsersBase = users_mapper_registry.generate_base()
-
-
-# class BaseModel(SQLModel):
-#     @declared_attr
-#     def __tablename__(cls) -> str:
-#         return snake_case(cls.__name__)
-#
-#     @classmethod
-#     def by_uuid(self, _uuid: uuid_pkg.UUID):
-#         with Session(get_engine()) as session:
-#             q = select(self).where(self.uuid == _uuid)
-#             org = session.exec(q).first()
-#             return org if org else None
-#
-#     def update(self, o: Union[SQLModel, dict] = None):
-#         if not o:
-#             raise ValueError("Must provide a model or dict to update values")
-#         o = o if isinstance(o, dict) else o.dict(exclude_unset=True)
-#         for key, value in o.items():
-#             setattr(self, key, value)
-#
-#         # save and commit to database
-#         with Session(get_engine()) as session:
-#             session.add(self)
-#             session.commit()
-#             session.refresh(self)
-#
-#     def delete(self):
-#         with Session(get_engine()) as session:
-#             self.status = StatusEntity.DELETED
-#             self.updated_at = datetime.utcnow()
-#             session.add(self)
-#             session.commit()
-#             session.refresh(self)
-#
-#     @classmethod
-#     def create(self, o: Union[SQLModel, dict] = None):
-#         if not o:
-#             raise ValueError("Must provide a model or dict to update values")
-#
-#         with Session(get_engine()) as session:
-#             obj = self.from_orm(o) if isinstance(o, SQLModel) else self(**o)
-#             session.add(obj)
-#             session.commit()
-#             session.refresh(obj)
-#
-#         return obj
 
 
 # ==========================
@@ -105,42 +48,23 @@ class Users(UsersBase):
 
 
 # ==========================
-# Admin Info
+# Tracking the Admin activity
 # ==========================
-# class Admin(BaseModel, table=True):
-#     pass
 
+class Admin(UsersBase):
+    __tablename__ = 'admin'
+    id = Column(Integer, primary_key=True)
+    admin_email = Column(String)
+    admin_username = Column(String)
+    admin_password = Column(String)
+    admin_price = Column(Integer)
 
-# ==================
-# Database functions
-# ==================
-# def get_engine(dsn: str = SU_DSN):
-#     return create_engine(dsn)
-#
-#
-# def get_session():
-#     with Session(get_engine()) as session:
-#         yield session
-#
-#
-# def create_db():
-#     logger.info("...Enabling pgvector and creating database tables")
-#     BaseModel.metadata.create_all(get_engine(dsn=SU_DSN))
-#     create_user_permissions()
-#
-#
-# def create_user_permissions():
-#     session = Session(get_engine(dsn=SU_DSN))
-#     # grant access to entire database and all tables to user DB_USER
-#     query = f"GRANT ALL PRIVILEGES ON DATABASE TO {config.POSTGRES_USER};"
-#     session.execute(query)
-#     session.commit()
-#     session.close()
-#
-#
-# def drop_db():
-#     BaseModel.metadata.drop_all(get_engine(dsn=SU_DSN))
+    def __init__(self, admin_email, admin_username, admin_password, admin_price):
+        self.admin_email = admin_email
+        self.admin_username = admin_username
+        self.admin_password = generate_password_hash(admin_password)
+        self.admin_price = admin_price
 
-#
-# if __name__ == "__main__":
-#     create_db()
+    def check_password(self, password):
+        return check_password_hash(self.admin_password, password)
+
