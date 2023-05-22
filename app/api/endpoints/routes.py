@@ -1,1 +1,2 @@
 HEALTH = "/health"
+BUY = "/buy"

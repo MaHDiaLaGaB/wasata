@@ -25,18 +25,22 @@ help:  ##  print help
 images:  ##  Build all images
 	echo "Building images"
 	cd dev-database && make image-db
-	make image-api
+	make start-api
 
 
-image-api:  ## build docker images
+start-api:  ## build docker images
 	echo "Building images"
 	docker build -t wasata/api .
 
-build-up:  ## build docker containers
+start_db:
+	echo "Building database"
+	cd dev-database && make image-db
+
+up:  ## build docker containers
 	docker-compose -f docker-compose.yml up -d
 
 
-down:  ## stop the active docker containers
+stop:  ## stop the active docker containers
 	docker-compose down
 
 

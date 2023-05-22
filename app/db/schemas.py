@@ -2,7 +2,7 @@ from enum import Enum
 import uuid
 from datetime import datetime
 from typing import Union
-from pydantic import BaseModel, EmailStr, PositiveFloat
+from pydantic import BaseModel, EmailStr
 
 
 class StatusEntity(str, Enum):
@@ -14,10 +14,21 @@ class StatusEntity(str, Enum):
     BLOCKED = "blocked"
 
 
-class UserBase(BaseModel):
+class WasataBase(BaseModel):
+    class Config:
+        orm_mode = True
+        extra = "forbid"
+        use_enum_values = True
+        anystr_strip_whitespace = True
+        validate_all = True
+        validate_assignment = True
+        allow_inf_nan = False
+
+
+class UserCreate(WasataBase):
     name: str
     email: EmailStr
-    tokens: PositiveFloat
+    tokens: float
 
     # @validator('tokens', pre=True)
     # def parse_tokens(cls, value):
@@ -27,7 +38,9 @@ class UserBase(BaseModel):
     #     validate_assignment = True
 
 
-class User(UserBase):
-    session: uuid.UUID
-    status: Union[StatusEntity, None]
-    date: datetime
+class UserGet(UserCreate):
+    uuid: uuid.UUID
+    status: Union[StatusEntity, None] = StatusEntity.ACTIVE
+    created_at: datetime
+    price: float
+

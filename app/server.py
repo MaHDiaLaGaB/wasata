@@ -1,13 +1,23 @@
-from fastapi import FastAPI
-from api.endpoints import health
+from fastapi import FastAPI, Depends
+from app.api.endpoints import health, users
 from .core.logg import setup_logging
 from .core.config import config
+from app.db.database_engine import UserDB, get_user_db
+from typing import AsyncGenerator
 
-app = FastAPI(docs_url="/docs")
+
+async def start_user_db_session(
+    db: UserDB = Depends(get_user_db),
+) -> AsyncGenerator[None, None]:
+    with db.create_session():
+        yield
+
+app = FastAPI(docs_url="/docs", dependencies=[Depends(start_user_db_session)])
 
 setup_logging()
 
 app.include_router(health.route)
+app.include_router(users.route)
 
 
 if config.ENVIRONMENT == "dev" and __name__ == "__main__":

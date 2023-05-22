@@ -3,9 +3,10 @@ uvicorn
 SQLAlchemy
 alembic
 sqlmodel
+sqlalchemy-utils
 requests
 python-dotenv
-httpx
 psycopg2-binary
 email-validator
+sentry-sdk
 

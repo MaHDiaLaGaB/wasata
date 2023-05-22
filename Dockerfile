@@ -1,8 +1,7 @@
 # Use the official Python base image
 FROM python:3.10-slim
 
-# Set the working directory
-WORKDIR /app
+WORKDIR /wasata
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
@@ -14,6 +13,9 @@ RUN apt-get update \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
+# Updateing pip
+RUN pip install --upgrade pip
+
 # Create and activate a virtual environment
 RUN python -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
@@ -23,10 +25,18 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the rest of the application code
-COPY . .
+COPY app /wasata/app
+COPY dev-database /wasata/dev-database
+
+
+# Make the entrypoint script executable
+COPY entrypoint.sh /wasata/entrypoint.sh
+COPY alembic.ini /wasata/alembic.ini
+COPY .env /wasata/.env
+COPY Makefile /wasata/Makefile
 
 # Expose the port the app runs on
 EXPOSE 8888
 
-# Start the application
-CMD ["uvicorn", "app.server:app", "--host", "0.0.0.0", "--port", "8888"]
+# Start the application using the entrypoint script
+CMD ["bash", "-c","uvicorn app.server:app --host 0.0.0.0 --port 8888 && alembic --name alembic upgrade head"]

@@ -6,19 +6,9 @@ from sqlalchemy import pool
 from alembic import context
 from dotenv import load_dotenv
 import os
+from app.core.config import config
 
-load_dotenv()
-
-POSTGRES_USER = os.getenv("POSTGRES_USER")
-POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD")
-DB_HOST = os.getenv("DB_HOST", "localhost")
-DB_PORT = os.getenv("DB_PORT", 5432)
-DB_NAME = os.getenv("DB_NAME")
-
-SU_DSN = (
-    f"postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
-)
-db_url = SU_DSN
+db_url = config.DATABASE_URI
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
@@ -32,9 +22,9 @@ if config.config_file_name is not None:
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-from app.db.models import BaseModel
+from app.db.models import UsersBase
 
-target_metadata = BaseModel.metadata
+target_metadata = UsersBase.metadata
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
