@@ -45,9 +45,12 @@ class UserGet(UserCreate):
     price: float
 
 
-class Admin(WasataBase):
+class AdminCreate(WasataBase):
     admin_email: str
     admin_username: str
     admin_password: str
     admin_price: float
+
+
+
 

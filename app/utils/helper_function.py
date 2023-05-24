@@ -3,6 +3,13 @@ import time
 from typing import Any, Callable
 from functools import partial
 import re
+from app.core.config import config
+import secrets
+from cryptography.fernet import Fernet
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
+from cryptography.hazmat.backends import default_backend
+import base64
 
 import requests
 
@@ -18,10 +25,10 @@ def snake_case(string: str) -> str:
 
 
 def wait_until_status_code(
-    url: str,
-    code_to_await: int = 200,
-    interval_seconds: float = 1,
-    fail_after_seconds: float = 30,
+        url: str,
+        code_to_await: int = 200,
+        interval_seconds: float = 1,
+        fail_after_seconds: float = 30,
 ) -> None:
     @wait_until_no_assertion_error(interval_seconds, fail_after_seconds)
     def check_result() -> None:
@@ -39,7 +46,7 @@ def wait_until_status_code(
 # fails after fail_after_seconds
 # ----------------------------------------------------------
 def wait_until_no_assertion_error(
-    interval_seconds: float = 0.2, fail_after_seconds: float = 3
+        interval_seconds: float = 0.2, fail_after_seconds: float = 3
 ) -> Any:
     def decorator(func: Callable[[], None]) -> Callable[[], None]:
         start = time.time()
@@ -54,3 +61,20 @@ def wait_until_no_assertion_error(
             time.sleep(interval_seconds)
 
     return decorator
+
+
+# TODO add CLI to this function
+def generate_secrete_key(admin_password):
+    # Generate a Fernet key from the password
+    salt = secrets.token_bytes(16)
+    kdf = PBKDF2HMAC(
+        algorithm=hashes.SHA256(),
+        length=32,
+        salt=salt,
+        iterations=1000,
+        backend=default_backend()
+    )
+    key = base64.urlsafe_b64encode(kdf.derive(admin_password))
+
+    admin_secret_fernet_instance = Fernet(key)
+    return admin_secret_fernet_instance

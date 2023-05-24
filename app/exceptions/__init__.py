@@ -98,3 +98,10 @@ class CouldNotParseEntry(WasataException):
     exception_code: int = 9
     status_code: int = HTTPStatus.BAD_REQUEST
     description: Optional[str] = "Could not parse Entry"
+
+
+@register_exception
+class WasataNotImplemented(WasataException):
+    exception_code: int = 10
+    status_code: int = HTTPStatus.NOT_IMPLEMENTED
+    description: Optional[str] = "Feature not implemented"

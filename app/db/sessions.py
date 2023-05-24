@@ -3,12 +3,12 @@ Manages database connections and sessions.
 """
 from typing import Any
 
-from .models import Users, UsersBase
+from .models import Users, UsersBase, Admin
 
-from .schemas import UserCreate, WasataBase
+from .schemas import UserCreate, WasataBase, AdminCreate
 from fastapi import Depends
 
-from app.exceptions import ObjectNotFound
+from app.exceptions import ObjectNotFound, NotFound
 import logging
 from .database_engine import UserDB, get_user_db
 from typing import TypeVar, Type, cast, Union, Dict
@@ -102,3 +102,34 @@ class UserRepository(BaseRepository):
     #         self, user: Users, user_update: Union[UserUpdate, UserUpdateEmail]
     # ) -> Users:
     #     return self._update_model_from_schema(user, user_update)
+
+
+class AdminRepository(BaseRepository):
+
+    def get_by_email(self, email: str) -> Admin | None:
+        admin = (
+            self.db.session.query(Admin)
+            .filter((func.lower(Admin.email) == email.lower()))
+            .one_or_none()
+        )
+        if admin is None:
+            logging.info(f"There is no user with email: {email}")
+            return None
+
+        return cast(Users, admin)
+
+    def create(self, admin_create: AdminCreate) -> Admin:
+        admin = Admin(**admin_create.dict())
+        return self._create(admin)
+
+    def update_price(self, admin_value, new_price) -> Admin | None:
+        admin = self.db.session.query(Admin).filter_by(Admin.value == admin_value).first()
+        if admin:
+            admin.admin_price = new_price
+            self.db.commit()
+            self.db.session.refresh(admin)
+            self.db.flush()
+            return admin
+        else:
+            logger.error("You are not the admin please try again")
+            raise NotFound

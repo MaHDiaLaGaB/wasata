@@ -52,6 +52,7 @@ services:
   pgadmin:
     container_name: wasata_pgadmin
     image: dpage/pgadmin4
+    platform: linux/amd64
     environment:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgadmin4@pgadmin.org}
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
@@ -73,6 +74,7 @@ services:
   dozzle:
     container_name: wasata_dozzle
     image: amir20/dozzle:latest
+    platform: linux/amd64
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     ports:

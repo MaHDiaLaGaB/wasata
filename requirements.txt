@@ -10,4 +10,5 @@ psycopg2-binary
 email-validator
 sentry-sdk
 Werkzeug
+cryptography
 

@@ -16,6 +16,9 @@ class Config(BaseSettings):
     POSTGRES_NAME: str = os.getenv("POSTGRES_DB")
     DATABASE_URI: str = f"postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_NAME}"
 
+    SECRETS_ENCRYPTION_KEY = os.getenv("SECRETS_ENCRYPTION_KEY")
+    MY_ADMIN_PASSWORD = os.getenv("MY_ADMIN_PASSWORD")
+
     DB_CONNECTION_TIMEOUT: int = 5
 
     class Config:
