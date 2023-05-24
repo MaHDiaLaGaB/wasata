@@ -39,6 +39,13 @@ start-db:
 up:  ## build docker containers
 	docker-compose -f docker-compose.yml up -d
 
+reset:
+	@make stop
+	sleep 1
+	@make images
+	sleep 1
+	@make up
+
 
 stop:  ## stop the active docker containers
 	docker-compose down

@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Depends
-from app.api.endpoints import health, users
+from app.api.endpoints import health, users, admin
 from .core.logg import setup_logging
 from .core.config import config
 from app.db.database_engine import UserDB, get_user_db
@@ -18,6 +18,7 @@ setup_logging()
 
 app.include_router(health.route)
 app.include_router(users.route)
+app.include_router(admin.route)
 
 
 if config.ENVIRONMENT == "dev" and __name__ == "__main__":

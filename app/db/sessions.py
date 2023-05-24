@@ -109,14 +109,14 @@ class AdminRepository(BaseRepository):
     def get_by_email(self, email: str) -> Admin | None:
         admin = (
             self.db.session.query(Admin)
-            .filter((func.lower(Admin.email) == email.lower()))
+            .filter((func.lower(Admin.admin_email) == email.lower()))
             .one_or_none()
         )
         if admin is None:
             logging.info(f"There is no user with email: {email}")
             return None
 
-        return cast(Users, admin)
+        return cast(Admin, admin)
 
     def create(self, admin_create: AdminCreate) -> Admin:
         admin = Admin(**admin_create.dict())

@@ -3,13 +3,14 @@ import time
 from typing import Any, Callable
 from functools import partial
 import re
-from app.core.config import config
+import os
 import secrets
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptography.hazmat.backends import default_backend
 import base64
+from dotenv import load_dotenv, find_dotenv
 
 import requests
 
@@ -78,3 +79,23 @@ def generate_secrete_key(admin_password):
 
     admin_secret_fernet_instance = Fernet(key)
     return admin_secret_fernet_instance
+
+
+def create_update_env_variable(key, value, secret_key):
+    # Load the .env file
+    dotenv_path = find_dotenv()
+    load_dotenv(dotenv_path)
+
+    # Check if secret key matches
+    if secret_key != os.getenv("SECRET_KEY"):
+        print("Invalid secret key!")
+        return
+
+    # Update the environment variable
+    os.environ[key] = value
+
+    # Write the variable to the .env file
+    with open(dotenv_path, 'a') as f:
+        f.write(f'{key}={value}\n')
+
+    print(f'{key}={value} has been saved or updated successfully.')

@@ -2,7 +2,7 @@ from enum import Enum
 import uuid
 from datetime import datetime
 from typing import Union
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, PrivateAttr, Field
 
 
 class StatusEntity(str, Enum):
@@ -46,10 +46,12 @@ class UserGet(UserCreate):
 
 
 class AdminCreate(WasataBase):
-    admin_email: str
+    admin_email: EmailStr
     admin_username: str
     admin_password: str
     admin_price: float
+    _value: str = PrivateAttr()
+    value: str = Field(alias="_value")
 
 
 
