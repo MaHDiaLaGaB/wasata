@@ -12,4 +12,5 @@ sentry-sdk
 Werkzeug
 cryptography
 itsdangerous
+binance-connector
 

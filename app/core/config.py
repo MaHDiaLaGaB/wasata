@@ -21,6 +21,16 @@ class Config(BaseSettings):
 
     DB_CONNECTION_TIMEOUT: int = 5
 
+    # Binance
+    BINANCE_SECRETE_KEY = os.getenv("BINANCE_SECRETE_KEY")
+    BINANCE_API_KEY = os.getenv("BINANCE_API_KEY")
+    BINANCE_BASE_URL = os.getenv("BINANCE_BASE_URL")
+
+    # test binance
+    TEST_BINANCE_URL = os.getenv("TEST_BINANCE_URL")
+    TEST_BIBANCE_API_KEY = os.getenv("TEST_BIBANCE_API_KEY")
+    TEST_BINANCE_SECRET_API = os.getenv("TEST_BINANCE_SECRET_API")
+
     class Config:
         env_file = ".env"
 

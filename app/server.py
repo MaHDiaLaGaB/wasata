@@ -12,6 +12,7 @@ async def start_user_db_session(
     with db.create_session():
         yield
 
+
 app = FastAPI(docs_url="/docs", dependencies=[Depends(start_user_db_session)])
 
 setup_logging()

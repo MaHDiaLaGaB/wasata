@@ -85,7 +85,6 @@ class UserBL:
         # user = self.user_repository.update(user, UserUpdate(address=account.address))
         # self.history_repository.add_platform_joined_event(user)
 
-
     # def update_email(self, user: User, update_user_email: UserUpdateEmail) -> User:
     #     # update the email and return updated user object
     #     self.user_repository.update(user, update_user_email)

@@ -52,7 +52,3 @@ class AdminCreate(WasataBase):
     admin_price: float
     _value: str = PrivateAttr()
     value: str = Field(alias="_value")
-
-
-
-

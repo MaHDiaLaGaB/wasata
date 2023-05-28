@@ -26,10 +26,10 @@ def snake_case(string: str) -> str:
 
 
 def wait_until_status_code(
-        url: str,
-        code_to_await: int = 200,
-        interval_seconds: float = 1,
-        fail_after_seconds: float = 30,
+    url: str,
+    code_to_await: int = 200,
+    interval_seconds: float = 1,
+    fail_after_seconds: float = 30,
 ) -> None:
     @wait_until_no_assertion_error(interval_seconds, fail_after_seconds)
     def check_result() -> None:
@@ -47,7 +47,7 @@ def wait_until_status_code(
 # fails after fail_after_seconds
 # ----------------------------------------------------------
 def wait_until_no_assertion_error(
-        interval_seconds: float = 0.2, fail_after_seconds: float = 3
+    interval_seconds: float = 0.2, fail_after_seconds: float = 3
 ) -> Any:
     def decorator(func: Callable[[], None]) -> Callable[[], None]:
         start = time.time()
@@ -73,7 +73,7 @@ def generate_secrete_key(admin_password):
         length=32,
         salt=salt,
         iterations=1000,
-        backend=default_backend()
+        backend=default_backend(),
     )
     key = base64.urlsafe_b64encode(kdf.derive(admin_password))
 
@@ -95,7 +95,7 @@ def create_update_env_variable(key, value, secret_key):
     os.environ[key] = value
 
     # Write the variable to the .env file
-    with open(dotenv_path, 'a') as f:
-        f.write(f'{key}={value}\n')
+    with open(dotenv_path, "a") as f:
+        f.write(f"{key}={value}\n")
 
-    print(f'{key}={value} has been saved or updated successfully.')
+    print(f"{key}={value} has been saved or updated successfully.")

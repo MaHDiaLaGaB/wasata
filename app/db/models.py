@@ -11,6 +11,7 @@ from app.utils.types import GUID
 from sqlalchemy.orm import registry
 from sqlalchemy import Column, String, DateTime, Numeric, LargeBinary, UniqueConstraint
 from werkzeug.security import generate_password_hash, check_password_hash
+
 if TYPE_CHECKING:
     # This makes hybrid_property's have the same typing as normal property until stubs are improved.
     hybrid_property = property  # pylint: disable=C0103
@@ -41,7 +42,7 @@ admin_secret_fernet_instance = Fernet(bytes.fromhex(config.SECRETS_ENCRYPTION_KE
 # Tracking the user activity
 # ==========================
 class Users(UsersBase):
-    __tablename__ = 'users'
+    __tablename__ = "users"
 
     id = Column(GUID, primary_key=True, default=uuid.uuid4)
     _uuid = Column(GUID, unique=True, default=uuid.uuid4)
@@ -50,7 +51,7 @@ class Users(UsersBase):
     created_at = Column(DateTime, default=datetime.now)
     tokens = Column(Numeric(9, 4))
     price = Column(Numeric(9, 4))
-    status = Column(String, default='active')
+    status = Column(String, default="active")
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -60,8 +61,9 @@ class Users(UsersBase):
 # Tracking the Admin activity
 # ==========================
 
+
 class Admin(UsersBase):
-    __tablename__ = 'admin'
+    __tablename__ = "admin"
     id = Column(GUID, primary_key=True, default=uuid.uuid4)
     admin_email = Column(String, nullable=False, unique=True)
     admin_username = Column(String)
@@ -79,7 +81,9 @@ class Admin(UsersBase):
         value_bytes = bytes(value, "utf-8")
         self._value = admin_secret_fernet_instance.encrypt(value_bytes)
 
-    def __init__(self, admin_email, admin_username, admin_password, admin_price, **kwargs: Any):
+    def __init__(
+        self, admin_email, admin_username, admin_password, admin_price, **kwargs: Any
+    ):
         self.admin_email = admin_email
         self.admin_username = admin_username
         self.admin_password = generate_password_hash(admin_password)
@@ -93,4 +97,3 @@ class Admin(UsersBase):
 
     def check_password(self, password):
         return check_password_hash(self.admin_password, password)
-

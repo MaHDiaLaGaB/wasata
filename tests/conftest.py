@@ -3,9 +3,11 @@ from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from databases import Database
-
+import requests
 from app.server import app
-from app.db.models import BaseModel, get_engine
+from app.core.config import config
+from app.api.dependencies import BinanceWa
+
 
 DATABASE_URL = "postgresql://user:password@localhost/test_db"
 
@@ -14,6 +16,29 @@ DATABASE_URL = "postgresql://user:password@localhost/test_db"
 def test_app():
     client = TestClient(app)
     yield client
+
+
+@pytest.fixture
+def spot_binance_api():
+    api_key = config.TEST_BIBANCE_API_KEY
+    api_secret = config.TEST_BINANCE_SECRET_API
+    base_url = config.TEST_BINANCE_URL
+    binance_class = BinanceWa(
+        binance_api_key=api_key, binance_api_secret=api_secret, base_url=base_url
+    )
+    yield binance_class
+
+
+# this for spot3
+@pytest.fixture
+def spot3_binance_api():
+    api_key = config.BINANCE_API_KEY
+    api_secret = config.BINANCE_SECRETE_KEY
+    base_url = config.BINANCE_BASE_URL
+    binance_class = BinanceWa(
+        binance_api_key=api_key, binance_api_secret=api_secret, base_url=base_url
+    )
+    yield binance_class
 
 
 # @pytest.fixture(scope="module")
