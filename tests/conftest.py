@@ -5,6 +5,7 @@ from sqlalchemy.orm import sessionmaker
 from databases import Database
 import requests
 from app.server import app
+from unittest.mock import patch
 from app.core.config import config
 from app.api.dependencies import BinanceWa
 
@@ -18,26 +19,24 @@ def test_app():
     yield client
 
 
+@pytest.fixture(scope="module")
+def mock_db_client():
+    with patch("app.main.db") as mock_db:
+        yield mock_db
+
+
 @pytest.fixture
 def spot_binance_api():
-    api_key = config.TEST_BIBANCE_API_KEY
-    api_secret = config.TEST_BINANCE_SECRET_API
     base_url = config.TEST_BINANCE_URL
-    binance_class = BinanceWa(
-        binance_api_key=api_key, binance_api_secret=api_secret, base_url=base_url
-    )
+    binance_class = BinanceWa(base_url=base_url)
     yield binance_class
 
 
 # this for spot3
 @pytest.fixture
 def spot3_binance_api():
-    api_key = config.BINANCE_API_KEY
-    api_secret = config.BINANCE_SECRETE_KEY
     base_url = config.BINANCE_BASE_URL
-    binance_class = BinanceWa(
-        binance_api_key=api_key, binance_api_secret=api_secret, base_url=base_url
-    )
+    binance_class = BinanceWa(base_url=base_url)
     yield binance_class
 
 

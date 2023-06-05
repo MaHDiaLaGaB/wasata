@@ -64,3 +64,6 @@ check-format:
 
 format-fix:
 	black .
+
+lint:
+	mypy --explicit-package-bases --config-file  mypy.ini

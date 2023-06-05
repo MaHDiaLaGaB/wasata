@@ -19,7 +19,7 @@ from sqlalchemy import func
 # User functions
 # ----------------------
 
-T = TypeVar("T", bound=UsersBase)
+T = TypeVar("T", bound=UsersBase)  # type: ignore
 
 logger = logging.getLogger(__name__)
 
@@ -72,7 +72,7 @@ class BaseRepository:
         self.db.flush()
         return model
 
-    def _delete(self, model: UsersBase) -> None:
+    def _delete(self, model: UsersBase) -> None:  # type: ignore
         self.db.session.delete(model)
         self.db.flush()
 
@@ -121,16 +121,16 @@ class AdminRepository(BaseRepository):
         admin = Admin(**admin_create.dict())
         return self._create(admin)
 
-    def update_price(self, admin_value, new_price) -> Admin | None:
-        admin = (
-            self.db.session.query(Admin).filter_by(Admin.value == admin_value).first()
-        )
-        if admin:
-            admin.admin_price = new_price
-            self.db.commit()
-            self.db.session.refresh(admin)
-            self.db.flush()
-            return admin
-        else:
-            logger.error("You are not the admin please try again")
-            raise NotFound
+    # def update_price(self, admin_value, new_price) -> Admin | None:
+    #     admin = (
+    #         self.db.session.query(Admin).filter_by(Admin.value == admin_value).first()
+    #     )
+    #     if admin:
+    #         admin.admin_price = new_price
+    #         self.db.commit()
+    #         self.db.session.refresh(admin)
+    #         self.db.flush()
+    #         return admin
+    #     else:
+    #         logger.error("You are not the admin please try again")
+    #         raise NotFound

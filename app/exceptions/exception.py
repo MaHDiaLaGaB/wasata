@@ -12,7 +12,7 @@ class WasataException(Exception):
     payload: Optional[Dict[str, Any]] = None
 
     def __init__(
-        self, description: Optional[str] = None, payload: Dict[str, Any] = None
+        self, description: Optional[str] = None, payload: Dict[str, Any] | None = None
     ) -> None:
         super().__init__()
         self.description = description or self.description

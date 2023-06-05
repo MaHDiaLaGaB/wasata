@@ -28,19 +28,14 @@ class WasataBase(BaseModel):
 class UserCreate(WasataBase):
     name: str
     email: EmailStr
+    phone_number: int
     tokens: float
-
-    # @validator('tokens', pre=True)
-    # def parse_tokens(cls, value):
-    #     return round(float(value), 4)
-    #
-    # class Config:
-    #     validate_assignment = True
+    wallet_address: str
 
 
 class UserGet(UserCreate):
     uuid: uuid.UUID
-    status: Union[StatusEntity, None] = StatusEntity.ACTIVE
+    status: Union[StatusEntity, None] = StatusEntity.INACTIVE
     created_at: datetime
     price: float
 

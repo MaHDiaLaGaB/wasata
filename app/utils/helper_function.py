@@ -1,21 +1,34 @@
 import logging
 import time
-from typing import Any, Callable
+from typing import Any, Callable, Dict
+from fastapi import status
+from fastapi.responses import JSONResponse
 from functools import partial
 import re
 import os
 import secrets
+import uuid
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptography.hazmat.backends import default_backend
 import base64
+import aiocache
+from starlette.responses import JSONResponse
+
+from app.core.config import config
 from dotenv import load_dotenv, find_dotenv
 
 import requests
 
 _snake_1 = partial(re.compile(r"(.)((?<![^A-Za-z])[A-Z][a-z]+)").sub, r"\1_\2")
 _snake_2 = partial(re.compile(r"([a-z0-9])([A-Z])").sub, r"\1_\2")
+
+aiocache_caching = (
+    aiocache.Cache(aiocache.SimpleMemoryCache)
+    if config.ENVIRONMENT == "dev"
+    else aiocache.Cache(aiocache.RedisCache, endpoint="localhost", port=6379)
+)
 
 
 # ---------------------------------------
@@ -65,7 +78,7 @@ def wait_until_no_assertion_error(
 
 
 # TODO add CLI to this function
-def generate_secrete_key(admin_password):
+def generate_secrete_key(admin_password: bytes) -> Fernet:
     # Generate a Fernet key from the password
     salt = secrets.token_bytes(16)
     kdf = PBKDF2HMAC(
@@ -81,7 +94,7 @@ def generate_secrete_key(admin_password):
     return admin_secret_fernet_instance
 
 
-def create_update_env_variable(key, value, secret_key):
+def create_update_env_variable(key, value, secret_key) -> None:  # type: ignore
     # Load the .env file
     dotenv_path = find_dotenv()
     load_dotenv(dotenv_path)
@@ -99,3 +112,54 @@ def create_update_env_variable(key, value, secret_key):
         f.write(f"{key}={value}\n")
 
     print(f"{key}={value} has been saved or updated successfully.")
+
+
+async def payment_getaway() -> JSONResponse | bool:
+    # Generate a unique token for the transaction
+    transaction_token = str(uuid.uuid4())
+
+    # Check if the token exists in the cache
+    if await aiocache_caching.get(transaction_token):
+        return JSONResponse(
+            content={"detail": "Duplicate transaction request"},
+            status_code=status.HTTP_400_BAD_REQUEST,
+        )
+    # TODO payment logic should me here
+
+    # Store the token in the cache with an expiration time (e.g., 5 minutes)
+    await aiocache_caching.set(transaction_token, True, ttl=300)
+    return True
+
+
+def check_idempotency_key(
+    idempotency_key: str, idempotency_keys: Dict[str, bool]
+) -> bool:
+    """
+    Check if the idempotency key exists in the storage.
+
+    :param idempotency_keys: dict contain the key
+    :param idempotency_key: The idempotency key to check.
+    :return: True if the key exists, False otherwise.
+    """
+    return idempotency_key in idempotency_keys
+
+
+def store_idempotency_key(
+    idempotency_key: str, idempotency_keys: Dict[str, bool]
+) -> None:
+    """
+    Store the idempotency key in the storage.
+
+    :param idempotency_keys:
+    :param idempotency_key: The idempotency key to store.
+    """
+    idempotency_keys[idempotency_key] = True
+
+
+def create_idempotency_key() -> str:
+    """
+    Generate a new idempotency key.
+
+    :return: A new unique idempotency key.
+    """
+    return str(uuid.uuid4())

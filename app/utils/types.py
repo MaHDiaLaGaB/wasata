@@ -6,7 +6,7 @@ from sqlalchemy import CHAR, TypeDecorator
 from sqlalchemy.dialects.postgresql import UUID
 
 
-class GUID(TypeDecorator):
+class GUID(TypeDecorator):  # type: ignore
     """Platform-independent GUID type.
 
     Uses PostgreSQL's UUID type, otherwise uses
@@ -20,7 +20,7 @@ class GUID(TypeDecorator):
     def python_type(self) -> Type[uuid.UUID]:
         return uuid.UUID
 
-    def process_literal_param(self, value: Any, dialect: Any) -> None:
+    def process_literal_param(self, value: Any, dialect: Any) -> str:
         raise WasataNotImplemented()
 
     impl = CHAR

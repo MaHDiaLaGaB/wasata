@@ -4,8 +4,9 @@
 import traceback
 
 import logging
-from typing import Dict
+from typing import Dict, Any
 from binance.spot import Spot as Client
+from app.core.config import config
 from binance.error import ClientError
 from app.exceptions import ServiceUnavailable, BadRequest
 
@@ -13,8 +14,16 @@ logger = logging.getLogger(__name__)
 
 
 class BinanceWa:
-    def __init__(self, binance_api_key: str, binance_api_secret: str, base_url: str) -> None:
-        self.client = Client(binance_api_key, binance_api_secret, base_url=base_url)
+    def __init__(self, base_url: str) -> None:
+        if base_url == config.TEST_BINANCE_URL:
+            self.client = Client(
+                config.TEST_BIBANCE_API_KEY,
+                config.TEST_BINANCE_SECRET_API,
+                base_url=base_url,
+            )
+        self.client = Client(
+            config.BINANCE_API_KEY, config.TEST_BINANCE_SECRET_API, base_url=base_url
+        )
 
     def check_connection(self) -> bool:
         try:
@@ -23,6 +32,7 @@ class BinanceWa:
         except ClientError as e:
             logger.error(f"server not connected {e}")
             raise BadRequest(description="no connection")
+        return False
 
     def check_system(self) -> bool:
         try:
@@ -34,8 +44,9 @@ class BinanceWa:
             return True
         except KeyError:
             logger.error("Failed to retrieve system status")
+        return False
 
-    def check_account(self) -> bool | None:
+    def check_account(self) -> bool:
         try:
             if self.check_system():
                 res = self.client.account()
@@ -49,10 +60,10 @@ class BinanceWa:
             logger.error(f"Error fetching balance: {e}")
             traceback.print_exc()
             raise BadRequest("something went wrong checking the account")
-        return None
+        return False
 
     # TODO add check_connection after test it
-    def get_balance(self, coin: str) -> Dict[str, float] | None:
+    def get_balance(self, coin: str) -> Dict[str, float] | Dict[str, str]:
         try:
             res = self.client.account()
             x = res["balances"]
@@ -67,17 +78,17 @@ class BinanceWa:
                 )
             )
             raise BadRequest(description="balance error")
-        return None
+        return dict({f"{coin}": "No asset"})
 
-    def withdraw(self, coin: str, amount: float, to_address: str, network: str | None):
+    def withdraw(self, coin: str, amount: float, to_address: str, network: str | None) -> Any:
         try:
             if amount <= 0:
                 raise ValueError("Amount must be greater than 0")
 
-            response = self.client.withdraw(
+            res = self.client.withdraw(
                 coin=coin, amount=amount, address=to_address, network=network
             )
-            return response
+            return res
         except ClientError as e:
             logger.error(f"Error withdrawing {coin}: {e}")
             traceback.print_exc()

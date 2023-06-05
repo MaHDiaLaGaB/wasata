@@ -1,6 +1,6 @@
 import os
 from dotenv import load_dotenv
-from pydantic import BaseSettings, condecimal
+from pydantic import BaseSettings
 
 load_dotenv()
 
@@ -8,15 +8,15 @@ load_dotenv()
 class Config(BaseSettings):
     ENVIRONMENT: str = os.getenv("ENVIRONMENT", "dev")
     API_PORT: int = int(os.getenv("API_PORT", 8000))
-    SECRET_KEY: str = os.getenv("SECRET_KEY")
-    POSTGRES_USER: str = os.getenv("POSTGRES_USER")
-    POSTGRES_PASSWORD: str = os.getenv("POSTGRES_PASSWORD")
-    POSTGRES_HOST: str = os.getenv("POSTGRES_HOST")
-    POSTGRES_PORT: int = os.getenv("POSTGRES_PORT")
-    POSTGRES_NAME: str = os.getenv("POSTGRES_DB")
+    SECRET_KEY: str | None = os.getenv("SECRET_KEY")
+    POSTGRES_USER: str | None = os.getenv("POSTGRES_USER")
+    POSTGRES_PASSWORD: str | None = os.getenv("POSTGRES_PASSWORD")
+    POSTGRES_HOST: str | None = os.getenv("POSTGRES_HOST")
+    POSTGRES_PORT: str | None = os.getenv("POSTGRES_PORT")
+    POSTGRES_NAME: str | None = os.getenv("POSTGRES_DB")
     DATABASE_URI: str = f"postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_NAME}"
 
-    SECRETS_ENCRYPTION_KEY = os.getenv("SECRETS_ENCRYPTION_KEY")
+    SECRETS_ENCRYPTION_KEY: str = os.getenv("SECRETS_ENCRYPTION_KEY", "my_secrete_key")
     MY_ADMIN_PASSWORD = os.getenv("MY_ADMIN_PASSWORD")
 
     DB_CONNECTION_TIMEOUT: int = 5
@@ -25,6 +25,7 @@ class Config(BaseSettings):
     BINANCE_SECRETE_KEY = os.getenv("BINANCE_SECRETE_KEY")
     BINANCE_API_KEY = os.getenv("BINANCE_API_KEY")
     BINANCE_BASE_URL = os.getenv("BINANCE_BASE_URL")
+    COIN = "USDT"
 
     # test binance
     TEST_BINANCE_URL = os.getenv("TEST_BINANCE_URL")

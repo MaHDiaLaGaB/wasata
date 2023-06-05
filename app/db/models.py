@@ -1,15 +1,22 @@
 """
 Contains your database models (e.g., SQLAlchemy ORM models) and their relationships.
 """
-from enum import Enum
 import logging
 from dotenv import load_dotenv
 import uuid
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Dict
 from cryptography.fernet import Fernet
 from app.utils.types import GUID
 from sqlalchemy.orm import registry
-from sqlalchemy import Column, String, DateTime, Numeric, LargeBinary, UniqueConstraint
+from sqlalchemy import (
+    Column,
+    String,
+    DateTime,
+    Numeric,
+    LargeBinary,
+    UniqueConstraint,
+    Integer,
+)
 from werkzeug.security import generate_password_hash, check_password_hash
 
 if TYPE_CHECKING:
@@ -41,19 +48,20 @@ admin_secret_fernet_instance = Fernet(bytes.fromhex(config.SECRETS_ENCRYPTION_KE
 # ==========================
 # Tracking the user activity
 # ==========================
-class Users(UsersBase):
-    __tablename__ = "users"
+class Users(UsersBase):  # type: ignore
+    __tablename__: str = "users"
 
     id = Column(GUID, primary_key=True, default=uuid.uuid4)
     _uuid = Column(GUID, unique=True, default=uuid.uuid4)
     name = Column(String)
     email = Column(String, nullable=False, unique=True)
+    phone_number = Column(Integer, nullable=False, unique=True)
     created_at = Column(DateTime, default=datetime.now)
     tokens = Column(Numeric(9, 4))
     price = Column(Numeric(9, 4))
-    status = Column(String, default="active")
+    status = Column(String)
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs: Dict[str, int | GUID | DateTime | Numeric]) -> None:
         super().__init__(**kwargs)
 
 
@@ -62,7 +70,7 @@ class Users(UsersBase):
 # ==========================
 
 
-class Admin(UsersBase):
+class Admin(UsersBase):  # type: ignore
     __tablename__ = "admin"
     id = Column(GUID, primary_key=True, default=uuid.uuid4)
     admin_email = Column(String, nullable=False, unique=True)
@@ -73,20 +81,25 @@ class Admin(UsersBase):
 
     @hybrid_property
     def value(self) -> str:
-        decrypted = admin_secret_fernet_instance.decrypt(self._value)
+        decrypted = admin_secret_fernet_instance.decrypt(self._value)  # type: ignore
         return decrypted.decode(encoding="utf-8")
 
     @value.setter
     def value(self, value: str) -> None:
         value_bytes = bytes(value, "utf-8")
-        self._value = admin_secret_fernet_instance.encrypt(value_bytes)
+        self._value = admin_secret_fernet_instance.encrypt(value_bytes)  # type: ignore
 
     def __init__(
-        self, admin_email, admin_username, admin_password, admin_price, **kwargs: Any
-    ):
+        self,
+        admin_email: Any,
+        admin_username: Any,
+        admin_password: Any,
+        admin_price: Any,
+        **kwargs: Any
+    ) -> None:
         self.admin_email = admin_email
         self.admin_username = admin_username
-        self.admin_password = generate_password_hash(admin_password)
+        self.admin_password = generate_password_hash(admin_password)  # type: ignore
         self.admin_price = admin_price
         value = kwargs["value"]
         del kwargs["value"]
@@ -95,5 +108,5 @@ class Admin(UsersBase):
 
     __table_args__ = (UniqueConstraint("admin_username", "admin_price"),)
 
-    def check_password(self, password):
-        return check_password_hash(self.admin_password, password)
+    def check_password(self, password: str) -> bool:
+        return check_password_hash(self.admin_password, password)  # type: ignore

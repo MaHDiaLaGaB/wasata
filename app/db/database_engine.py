@@ -25,7 +25,7 @@ class DB:
         self._sessionmaker = sessionmaker(
             self.engine, autocommit=False, autoflush=False
         )
-        self._current_session: Session = ContextVar("_current_session", default=None)
+        self._current_session: Session = ContextVar("_current_session", default=None)  # type: ignore
         self.commit_on_flush: bool = False
 
     def create_tables(self) -> None:
@@ -41,7 +41,7 @@ class DB:
     @property
     def session(self) -> Session:
         assert (
-            self._current_session.get()
+            self._current_session.get()  # type: ignore
         ), f"Please run within database session context, for example use the @requires_db decorator {self}"
         return self._current_session.get()
 
@@ -51,18 +51,18 @@ class DB:
         Create a session in a context manager block, can be configure to run with or without
         """
         assert (
-            not self._current_session.get()
+            not self._current_session.get()  # type: ignore
         ), "Nested database sessions are not possible"
         try:
             self.commit_on_flush = commit_on_flush
             with self._sessionmaker() as session:
-                self._current_session.set(session)
+                self._current_session.set(session)  # type: ignore
                 yield
                 session.commit()
         except Exception as exc:
             raise exc
         finally:
-            self._current_session.set(None)
+            self._current_session.set(None)   # type: ignore
             self.commit_on_flush = False
 
     # decorate a whole endpoint if the session scope is this full endpoint

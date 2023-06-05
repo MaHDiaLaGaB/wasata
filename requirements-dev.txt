@@ -2,3 +2,4 @@ black
 pytest
 databases
 httpx
+mypy

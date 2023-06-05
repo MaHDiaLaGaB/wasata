@@ -4,7 +4,7 @@ import os
 from logging.handlers import TimedRotatingFileHandler
 
 
-def setup_logging():
+def setup_logging() -> None:
     if not os.path.exists("logs"):
         os.makedirs("logs")
 

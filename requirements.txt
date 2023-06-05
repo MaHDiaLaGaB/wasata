@@ -13,4 +13,7 @@ Werkzeug
 cryptography
 itsdangerous
 binance-connector
+aiocache
+aioredis
+
 

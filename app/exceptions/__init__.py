@@ -30,7 +30,7 @@ class NotFound(WasataException):
     status_code: int = HTTPStatus.NOT_FOUND
     description: Optional[str] = "Requested object not found"
 
-    def __init__(self, object_id: str = None) -> None:
+    def __init__(self, object_id: str | None = None) -> None:
         super().__init__()
         if object_id:
             self.description: Optional[str] = f"Object with id {object_id} not found"
@@ -43,7 +43,7 @@ class ObjectNotFound(WasataException):
     status_code: int = HTTPStatus.NOT_FOUND
     description: Optional[str] = "Requested object not found"
 
-    def __init__(self, object_id: Union[str, UUID] = None) -> None:
+    def __init__(self, object_id: Union[str, UUID] | None = None) -> None:
         super().__init__()
         if object_id:
             self.description: Optional[
@@ -87,7 +87,7 @@ class BadRequest(WasataException):
 
 
 @register_exception
-class CouldNotParseFile(WasataException):
+class AdminTokenRunOut(WasataException):
     exception_code: int = 8
     status_code: int = HTTPStatus.BAD_REQUEST
     description: Optional[str] = "Could not parse file"
@@ -105,3 +105,10 @@ class WasataNotImplemented(WasataException):
     exception_code: int = 10
     status_code: int = HTTPStatus.NOT_IMPLEMENTED
     description: Optional[str] = "Feature not implemented"
+
+
+@register_exception
+class WithdrawError(WasataException):
+    exception_code: int = 11
+    status_code: int = HTTPStatus.BAD_REQUEST
+    description: Optional[str] = "can not withdraw at the moment"

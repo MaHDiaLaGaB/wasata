@@ -13,7 +13,7 @@ class AdminBL:
 
     @staticmethod
     # TODO add this logic in the makefile
-    def generate_privet_key():
+    def generate_privet_key() -> bytes:
         privet_secret_key = Fernet.generate_key()
         return privet_secret_key
 
