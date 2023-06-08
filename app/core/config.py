@@ -26,6 +26,7 @@ class Config(BaseSettings):
     BINANCE_API_KEY = os.getenv("BINANCE_API_KEY")
     BINANCE_BASE_URL = os.getenv("BINANCE_BASE_URL")
     COIN = "USDT"
+    PRICE: float | None = os.getenv("PRICE")
 
     # test binance
     TEST_BINANCE_URL = os.getenv("TEST_BINANCE_URL")

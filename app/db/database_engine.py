@@ -62,7 +62,7 @@ class DB:
         except Exception as exc:
             raise exc
         finally:
-            self._current_session.set(None)   # type: ignore
+            self._current_session.set(None)  # type: ignore
             self.commit_on_flush = False
 
     # decorate a whole endpoint if the session scope is this full endpoint

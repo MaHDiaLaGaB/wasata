@@ -1,8 +1,7 @@
 from enum import Enum
-import uuid
-from datetime import datetime
-from typing import Union
-from pydantic import BaseModel, EmailStr, PrivateAttr, Field
+
+from pydantic import BaseModel, EmailStr, PrivateAttr, Field, validator, Extra
+from typing import Optional
 
 
 class StatusEntity(str, Enum):
@@ -17,7 +16,7 @@ class StatusEntity(str, Enum):
 class WasataBase(BaseModel):
     class Config:
         orm_mode = True
-        extra = "forbid"
+        extra = Extra.allow
         use_enum_values = True
         anystr_strip_whitespace = True
         validate_all = True
@@ -30,14 +29,30 @@ class UserCreate(WasataBase):
     email: EmailStr
     phone_number: int
     tokens: float
-    wallet_address: str
+
+    @validator("name")
+    def validate_name(cls, name):
+        if len(name) < 3:
+            raise ValueError("Name must be at least 3 characters long")
+        return name
+
+    @validator("phone_number")
+    def validate_phone_number(cls, phone_number):
+        if len(str(phone_number)) != 9:
+            raise ValueError("Phone number must be exactly 9 digits long")
+        return phone_number
+
+    @validator("tokens")
+    def validate_tokens(cls, tokens):
+        if tokens <= 0:
+            raise ValueError("Tokens must be greater than 0")
+        return tokens
 
 
-class UserGet(UserCreate):
-    uuid: uuid.UUID
-    status: Union[StatusEntity, None] = StatusEntity.INACTIVE
-    created_at: datetime
-    price: float
+class UserUpdate(WasataBase):
+    price: Optional[float] = None
+    tokens: Optional[float] = None
+    status: Optional[StatusEntity] = None
 
 
 class AdminCreate(WasataBase):

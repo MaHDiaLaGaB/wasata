@@ -5,10 +5,10 @@ from typing import Any
 
 from .models import Users, UsersBase, Admin
 
-from .schemas import UserCreate, WasataBase, AdminCreate
+from .schemas import UserCreate, WasataBase, AdminCreate, UserUpdate
 from fastapi import Depends
 
-from app.exceptions import ObjectNotFound, NotFound
+from app.exceptions import ObjectNotFound
 import logging
 from .database_engine import UserDB, get_user_db
 from typing import TypeVar, Type, cast, Union, Dict
@@ -98,10 +98,8 @@ class UserRepository(BaseRepository):
 
         return cast(Users, user)
 
-    # def update(
-    #         self, user: Users, user_update: Union[UserUpdate, UserUpdateEmail]
-    # ) -> Users:
-    #     return self._update_model_from_schema(user, user_update)
+    def update(self, user: Users, user_update: UserUpdate) -> Users:
+        return self._update_model_from_schema(user, user_update)
 
 
 class AdminRepository(BaseRepository):
