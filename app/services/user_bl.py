@@ -1,19 +1,13 @@
 import logging
-from typing import Tuple
 
-# from common.schemas.secrets import KeypairGet
 from fastapi import Depends
-
+from app.core.config import config
 from app.db.models import Users
-from app.exceptions import ObjectNotFound
-from app.db.schemas import (
-    # EmailVerification,
-    # RegistrationCreate,
-    UserCreate,
-    # UserUpdate,
-    # UserUpdateEmail,
-)
+
+from app.db.schemas import UserCreate, UserUpdate
 from app.db.sessions import UserRepository
+
+logger = logging.getLogger(__name__)
 
 
 class UserBL:
@@ -72,7 +66,13 @@ class UserBL:
             return user
 
         else:
-            raise ObjectNotFound
+            logger.info("the user already exist ...")
+            user = self.user_repository.update(
+                user=user,
+                user_update=UserUpdate(tokens=user_create.tokens, price=config.PRICE),
+            )
+
+            return user
         # if user with this auth id exists, just return it
         # try:
         #     return self.user_repository.get_by_auth_id(user_create.auth_id or "not set")

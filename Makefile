@@ -22,7 +22,7 @@ help:  ##  print help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ": .*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
 
-images:  ##  Build all images
+build-images:  ##  Build all images
 	echo "Building images"
 	cd dev-database && make image-db
 	make start-api
@@ -42,7 +42,7 @@ up:  ## build docker containers
 reset:
 	@make stop
 	sleep 1
-	@make images
+	@make build-images
 	sleep 1
 	@make up
 

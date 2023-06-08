@@ -15,14 +15,18 @@ logger = logging.getLogger(__name__)
 
 class BinanceWa:
     def __init__(self, base_url: str) -> None:
-        if base_url == config.TEST_BINANCE_URL:
+        self.base_url = base_url
+        logger.info("it's working")
+        if self.base_url == config.TEST_BINANCE_URL:
             self.client = Client(
-                config.TEST_BIBANCE_API_KEY,
-                config.TEST_BINANCE_SECRET_API,
-                base_url=base_url,
+                api_key=config.TEST_BIBANCE_API_KEY,
+                api_secret=config.TEST_BINANCE_SECRET_API,
+                base_url=self.base_url,
             )
         self.client = Client(
-            config.BINANCE_API_KEY, config.TEST_BINANCE_SECRET_API, base_url=base_url
+            api_key=config.BINANCE_API_KEY,
+            api_secret=config.BINANCE_SECRETE_KEY,
+            base_url=self.base_url,
         )
 
     def check_connection(self) -> bool:
@@ -62,14 +66,18 @@ class BinanceWa:
             raise BadRequest("something went wrong checking the account")
         return False
 
-    # TODO add check_connection after test it
     def get_balance(self, coin: str) -> Dict[str, float] | Dict[str, str]:
         try:
-            res = self.client.account()
-            x = res["balances"]
-            for asset in x:
-                if asset["asset"] == coin:
-                    return dict({f"{asset['asset']}": float(f"{asset['free']}")})
+            if self.check_system():
+                res = self.client.account()
+                x = res["balances"]
+                for asset in x:
+                    if asset["asset"] == coin:
+                        logger.info(f"{asset['asset']}: {float(asset['free'])}")
+                        return dict({f"{asset['asset']}": float(f"{asset['free']}")})
+            else:
+                logger.error("system error ...")
+                raise BadRequest()
 
         except ClientError as error:
             logger.error(
@@ -80,7 +88,9 @@ class BinanceWa:
             raise BadRequest(description="balance error")
         return dict({f"{coin}": "No asset"})
 
-    def withdraw(self, coin: str, amount: float, to_address: str, network: str | None) -> Any:
+    def withdraw(
+        self, coin: str, amount: float, to_address: str, network: str | None
+    ) -> Any:
         try:
             if amount <= 0:
                 raise ValueError("Amount must be greater than 0")

@@ -1,8 +1,8 @@
 import logging
 import time
 from typing import Any, Callable, Dict
-from fastapi import status
-from fastapi.responses import JSONResponse
+from fastapi import status, HTTPException
+
 from functools import partial
 import re
 import os
@@ -114,21 +114,21 @@ def create_update_env_variable(key, value, secret_key) -> None:  # type: ignore
     print(f"{key}={value} has been saved or updated successfully.")
 
 
-async def payment_getaway() -> JSONResponse | bool:
+async def payment_getaway(usdt_price: float) -> HTTPException | float:
     # Generate a unique token for the transaction
     transaction_token = str(uuid.uuid4())
 
     # Check if the token exists in the cache
     if await aiocache_caching.get(transaction_token):
-        return JSONResponse(
-            content={"detail": "Duplicate transaction request"},
+        return HTTPException(
+            detail="Duplicate transaction request",
             status_code=status.HTTP_400_BAD_REQUEST,
         )
     # TODO payment logic should me here
 
     # Store the token in the cache with an expiration time (e.g., 5 minutes)
     await aiocache_caching.set(transaction_token, True, ttl=300)
-    return True
+    return usdt_price
 
 
 def check_idempotency_key(

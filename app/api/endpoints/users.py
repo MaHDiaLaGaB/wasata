@@ -1,34 +1,29 @@
 import logging
-from fastapi import APIRouter, status, Depends, HTTPException
+from fastapi import APIRouter, status, Depends, HTTPException, Body, Query
 from .routes import BUY
-from app.db.schemas import UserCreate, UserGet, StatusEntity
+from app.db.schemas import UserCreate
 from http import HTTPStatus
-from app.db.database_engine import UserDB
+
 from app.core.config import config
 from app.services.user_bl import UserBL
 from app.api.dependencies import BinanceWa
 from app.exceptions import BadRequest, AdminTokenRunOut
-from app.utils.helper_function import payment_getaway
+
+# from app.utils.helper_function import payment_getaway
 
 logger = logging.getLogger(__name__)
 
 route = APIRouter(tags=["users"])
 
-user_db = UserDB()
 
-
-@route.post(
-    BUY,
-    status_code=HTTPStatus.CREATED,
-)
+@route.post(BUY, status_code=HTTPStatus.CREATED)
 def create(
     *,
-    user: UserCreate,
+    user: UserCreate = Body(),
     user_bl: UserBL = Depends(),
     binance_end: BinanceWa = Depends(),
-) -> UserGet:
-    # set the user status to Buying
-    # UserGet.status = StatusEntity.ACTIVE
+    wallet_address: str = Query(),
+):
 
     # check binance connection
     if not binance_end.check_connection():
@@ -44,21 +39,27 @@ def create(
     # check if user usdt request is more than wasata balance
     balance = binance_end.get_balance(coin=config.COIN)
     if balance:
-        if float(balance["asset"]) <= user.tokens:
+        print(balance[config.COIN])
+        if float(balance[config.COIN]) <= user.tokens:
             raise AdminTokenRunOut()
 
-    logging.info(f"Adding new user {user}")
+    logging.info(f"Adding new user ")
     if user.tokens <= 0:
         raise ValueError("Price must be greater than 0")
 
+    usdt_price = user.tokens * float(config.PRICE)
+
     # TODO here i will read the payment response
-    res = payment_getaway()
-    if res:
-        logger.info("sending info to binance to start sending ... ")
+    # res = payment_getaway(usdt_price=usdt_price)
+    if usdt_price:
+        logger.info(
+            f"sending info to binance to start sending to {wallet_address} ... "
+        )
 
     # Because of testing will comment the binance withdraw
-    # binance_end.withdraw(coin=config.COIN, amount=user.tokens, to_address=user.wallet_address, network=None)
+    # binance_end.withdraw(coin=config.COIN, amount=user.tokens, to_address=wallet_address, network=None)
 
-    # UserGet.status = StatusEntity.INACTIVE
+    user.price = usdt_price
+    created_user = user_bl.create_user(user)
 
-    return user_bl.create_user(user)
+    return created_user

@@ -26,7 +26,9 @@ api_key_header = APIKeyHeader(name="X-API-Key", auto_error=False)
 
 
 @route.post("/admin", include_in_schema=True, status_code=status.HTTP_201_CREATED)
-def admin_endpoint(*, api_key: str, admin: AdminCreate, admin_bl: AdminBL = Depends()) -> Dict[str, Any]:
+def admin_endpoint(
+    *, api_key: str, admin: AdminCreate, admin_bl: AdminBL = Depends()
+) -> Dict[str, Any]:
     if config.SECRETS_ENCRYPTION_KEY != api_key:
         raise Forbidden
 

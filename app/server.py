@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Depends
 from app.api.endpoints import health, users, admin
-from .core.logg import setup_logging
-from .core.config import config
+from app.core.logg import setup_logging
+from app.core.config import config
 from app.db.database_engine import UserDB, get_user_db
 from typing import AsyncGenerator
 

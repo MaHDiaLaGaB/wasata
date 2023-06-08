@@ -1,8 +1,8 @@
-"""init-migration
+"""init_alembic
 
-Revision ID: d6eb8452ec59
+Revision ID: 012f182469a3
 Revises: 
-Create Date: 2023-05-24 13:40:42.104941
+Create Date: 2023-06-07 22:50:44.011895
 
 """
 from alembic import op
@@ -11,7 +11,7 @@ import app
 
 
 # revision identifiers, used by Alembic.
-revision = "d6eb8452ec59"
+revision = "012f182469a3"
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -37,6 +37,7 @@ def upgrade() -> None:
         sa.Column("_uuid", app.utils.types.GUID(), nullable=True),
         sa.Column("name", sa.String(), nullable=True),
         sa.Column("email", sa.String(), nullable=False),
+        sa.Column("phone_number", sa.BigInteger(), nullable=False),
         sa.Column("created_at", sa.DateTime(), nullable=True),
         sa.Column("tokens", sa.Numeric(precision=9, scale=4), nullable=True),
         sa.Column("price", sa.Numeric(precision=9, scale=4), nullable=True),
@@ -44,6 +45,7 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("_uuid"),
         sa.UniqueConstraint("email"),
+        sa.UniqueConstraint("phone_number"),
     )
     # ### end Alembic commands ###
 

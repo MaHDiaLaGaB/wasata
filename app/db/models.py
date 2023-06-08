@@ -15,7 +15,7 @@ from sqlalchemy import (
     Numeric,
     LargeBinary,
     UniqueConstraint,
-    Integer,
+    BigInteger,
 )
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -55,7 +55,7 @@ class Users(UsersBase):  # type: ignore
     _uuid = Column(GUID, unique=True, default=uuid.uuid4)
     name = Column(String)
     email = Column(String, nullable=False, unique=True)
-    phone_number = Column(Integer, nullable=False, unique=True)
+    phone_number = Column(BigInteger, nullable=False, unique=True)
     created_at = Column(DateTime, default=datetime.now)
     tokens = Column(Numeric(9, 4))
     price = Column(Numeric(9, 4))
