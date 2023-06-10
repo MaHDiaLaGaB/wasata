@@ -67,3 +67,9 @@ format-fix:
 
 lint:
 	mypy --explicit-package-bases --config-file  mypy.ini
+
+create-admin-key:
+	@PYTHONPATH=. python3 app/tools/my_cli.py
+
+change-usdt-price:
+	@PYTHONPATH=. python3 app/tools/change_price.py
