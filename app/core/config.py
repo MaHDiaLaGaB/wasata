@@ -1,14 +1,17 @@
 import os
 from dotenv import load_dotenv
-from pydantic import BaseSettings
+from .base_configuration import BaseConfig
 
 load_dotenv()
 
 
-class Config(BaseSettings):
+class Config(BaseConfig):
+    TITLE: str = os.getenv("TITLE", "FastAPI")
+    VERSION: str = os.getenv("VERSION", "V1")
     ENVIRONMENT: str = os.getenv("ENVIRONMENT", "dev")
     API_PORT: int = int(os.getenv("API_PORT", 8000))
-    SECRET_KEY: str | None = os.getenv("SECRET_KEY")
+    ADMIN_USERNAME: str = os.getenv("USERNAME", "admin")
+    ADMIN_PASSWORD: str = os.getenv("PASSWORD", "password")
     POSTGRES_USER: str | None = os.getenv("POSTGRES_USER")
     POSTGRES_PASSWORD: str | None = os.getenv("POSTGRES_PASSWORD")
     POSTGRES_HOST: str | None = os.getenv("POSTGRES_HOST")
@@ -16,8 +19,7 @@ class Config(BaseSettings):
     POSTGRES_NAME: str | None = os.getenv("POSTGRES_DB")
     DATABASE_URI: str = f"postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_NAME}"
 
-    SECRETS_ENCRYPTION_KEY: str = os.getenv("SECRETS_ENCRYPTION_KEY", "my_secrete_key")
-    MY_ADMIN_PASSWORD = os.getenv("MY_ADMIN_PASSWORD")
+    SECRETS_ENCRYPTION_KEY: str | None= os.getenv("SECRETS_ENCRYPTION_KEY")
 
     DB_CONNECTION_TIMEOUT: int = 5
 
@@ -26,7 +28,7 @@ class Config(BaseSettings):
     BINANCE_API_KEY = os.getenv("BINANCE_API_KEY")
     BINANCE_BASE_URL = os.getenv("BINANCE_BASE_URL")
     COIN = "USDT"
-    PRICE: float | None = os.getenv("PRICE")
+    PRICE: float | None = os.getenv("USDT")
 
     # test binance
     TEST_BINANCE_URL = os.getenv("TEST_BINANCE_URL")

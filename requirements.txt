@@ -15,5 +15,6 @@ itsdangerous
 binance-connector
 aiocache
 aioredis
+python-jose
 
 

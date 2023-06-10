@@ -11,6 +11,7 @@ ENV PYTHONUNBUFFERED 1
 RUN apt-get update \
     && apt-get -y install gcc \
     && apt-get clean \
+    && apt-get install -y make \
     && rm -rf /var/lib/apt/lists/* \
     && pip install --upgrade pip
 
@@ -33,6 +34,8 @@ COPY alembic.ini /wasata/alembic.ini
 COPY .env /wasata/.env
 COPY Makefile /wasata/Makefile
 COPY entrypoint.sh wasata/entrypoint.sh
+
+CMD ["make"]
 
 RUN chmod +x wasata/entrypoint.sh
 

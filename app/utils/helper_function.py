@@ -8,16 +8,11 @@ import re
 import os
 import secrets
 import uuid
-from cryptography.fernet import Fernet
-from cryptography.hazmat.primitives import hashes
-from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
-from cryptography.hazmat.backends import default_backend
-import base64
+
 import aiocache
-from starlette.responses import JSONResponse
 
 from app.core.config import config
-from dotenv import load_dotenv, find_dotenv
+
 
 import requests
 
@@ -75,43 +70,6 @@ def wait_until_no_assertion_error(
             time.sleep(interval_seconds)
 
     return decorator
-
-
-# TODO add CLI to this function
-def generate_secrete_key(admin_password: bytes) -> Fernet:
-    # Generate a Fernet key from the password
-    salt = secrets.token_bytes(16)
-    kdf = PBKDF2HMAC(
-        algorithm=hashes.SHA256(),
-        length=32,
-        salt=salt,
-        iterations=1000,
-        backend=default_backend(),
-    )
-    key = base64.urlsafe_b64encode(kdf.derive(admin_password))
-
-    admin_secret_fernet_instance = Fernet(key)
-    return admin_secret_fernet_instance
-
-
-def create_update_env_variable(key, value, secret_key) -> None:  # type: ignore
-    # Load the .env file
-    dotenv_path = find_dotenv()
-    load_dotenv(dotenv_path)
-
-    # Check if secret key matches
-    if secret_key != os.getenv("SECRET_KEY"):
-        print("Invalid secret key!")
-        return
-
-    # Update the environment variable
-    os.environ[key] = value
-
-    # Write the variable to the .env file
-    with open(dotenv_path, "a") as f:
-        f.write(f"{key}={value}\n")
-
-    print(f"{key}={value} has been saved or updated successfully.")
 
 
 async def payment_getaway(usdt_price: float) -> HTTPException | float:
