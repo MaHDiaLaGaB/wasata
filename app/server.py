@@ -18,7 +18,7 @@ from app.exceptions import Unauthorized, Forbidden
 
 
 async def start_user_db_session(
-        db: UserDB = Depends(get_user_db),
+    db: UserDB = Depends(get_user_db),
 ) -> AsyncGenerator[None, None]:
     with db.create_session():
         yield
@@ -51,7 +51,7 @@ def get_current_username(credentials: HTTPBasicCredentials = Depends(security)) 
 
 @app.exception_handler(WasataException)
 def exception_handler_middleware(
-        _request: Request, exception: WasataException
+    _request: Request, exception: WasataException
 ) -> JSONResponse:
     return handle_exception(config, exception)
 
@@ -62,14 +62,18 @@ app.include_router(admin.route)
 
 
 @app.get("/docs", include_in_schema=False)
-async def get_swagger_documentation(username: str = Depends(get_current_username)) -> HTMLResponse:
+async def get_swagger_documentation(
+    username: str = Depends(get_current_username),
+) -> HTMLResponse:
     if not username:
         raise Forbidden()
     return get_swagger_ui_html(openapi_url="/openapi.json", title="docs")
 
 
 @app.get("/redoc", include_in_schema=False)
-async def get_redoc_documentation(username: str = Depends(get_current_username)) -> HTMLResponse:
+async def get_redoc_documentation(
+    username: str = Depends(get_current_username),
+) -> HTMLResponse:
     if not username:
         raise Forbidden()
     return get_redoc_html(openapi_url="/openapi.json", title="docs")

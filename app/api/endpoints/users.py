@@ -9,7 +9,7 @@ from app.services.user_bl import UserBL
 from app.api.dependencies import BinanceWa
 from app.exceptions import BadRequest, AdminTokenRunOut
 
-# from app.utils.helper_function import payment_getaway
+from app.utils.helper_function import payment_getaway
 
 logger = logging.getLogger(__name__)
 
@@ -17,12 +17,12 @@ route = APIRouter(tags=["users"])
 
 
 @route.post(BUY, status_code=HTTPStatus.CREATED)
-def create(
-        *,
-        user: UserCreate = Body(),
-        user_bl: UserBL = Depends(),
-        binance_end: BinanceWa = Depends(),
-        wallet_address: str = Query(),
+async def create(
+    *,
+    user: UserCreate = Body(),
+    user_bl: UserBL = Depends(),
+    binance_end: BinanceWa = Depends(),
+    wallet_address: str = Query(),
 ) -> UserGet:
     # check binance connection
     if not binance_end.check_connection():
@@ -51,8 +51,8 @@ def create(
     usdt_price = user.tokens * float(config.PRICE)  # type: ignore
 
     # TODO here i will read the payment response
-    # res = payment_getaway(usdt_price=usdt_price)
-    if usdt_price:
+    res = await payment_getaway(usdt_price=usdt_price)
+    if res:
         logger.info(
             f"sending info to binance to start sending to {wallet_address} ... "
         )

@@ -2,18 +2,11 @@ import logging
 import time
 from typing import Any, Callable, Dict
 from fastapi import status, HTTPException
-
 from functools import partial
 import re
-import os
-import secrets
 import uuid
-
 import aiocache
-
 from app.core.config import config
-
-
 import requests
 
 _snake_1 = partial(re.compile(r"(.)((?<![^A-Za-z])[A-Z][a-z]+)").sub, r"\1_\2")
@@ -85,7 +78,7 @@ async def payment_getaway(usdt_price: float) -> HTTPException | float:
     # TODO payment logic should me here
 
     # Store the token in the cache with an expiration time (e.g., 5 minutes)
-    await aiocache_caching.set(transaction_token, True, ttl=300)
+    await aiocache_caching.set(transaction_token, True, ttl=5)
     return usdt_price
 
 
