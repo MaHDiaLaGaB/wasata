@@ -18,11 +18,11 @@ route = APIRouter(tags=["users"])
 
 @route.post(BUY, status_code=HTTPStatus.CREATED)
 async def create(
-        *,
-        user: UserCreate = Body(),
-        user_bl: UserBL = Depends(),
-        binance_end: BinanceWa = Depends(),
-        wallet_address: str = Query(),
+    *,
+    user: UserCreate = Body(),
+    user_bl: UserBL = Depends(),
+    binance_end: BinanceWa = Depends(),
+    wallet_address: str = Query(),
 ) -> UserGet:
     # check binance connection
     if not binance_end.check_connection():

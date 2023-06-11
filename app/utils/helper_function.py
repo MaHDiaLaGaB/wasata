@@ -2,18 +2,11 @@ import logging
 import time
 from typing import Any, Callable, Dict
 from fastapi import status, HTTPException
-
 from functools import partial
 import re
-import os
-import secrets
 import uuid
-
 import aiocache
-
 from app.core.config import config
-
-
 import requests
 
 _snake_1 = partial(re.compile(r"(.)((?<![^A-Za-z])[A-Z][a-z]+)").sub, r"\1_\2")

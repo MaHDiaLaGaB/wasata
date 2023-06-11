@@ -19,7 +19,7 @@ class Config(BaseConfig):
     POSTGRES_NAME: str | None = os.getenv("POSTGRES_DB")
     DATABASE_URI: str = f"postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_NAME}"
 
-    SECRETS_ENCRYPTION_KEY: str | None= os.getenv("SECRETS_ENCRYPTION_KEY")
+    SECRETS_ENCRYPTION_KEY: str | None = os.getenv("SECRETS_ENCRYPTION_KEY")
 
     DB_CONNECTION_TIMEOUT: int = 5
 

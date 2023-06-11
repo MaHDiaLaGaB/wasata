@@ -5,7 +5,9 @@ from app.core.config import config
 from dotenv import load_dotenv, find_dotenv
 
 
-def create_update_env_variable(k: str, v: str, secret_key: str) -> Tuple[Any, Any] | None:
+def create_update_env_variable(
+    k: str, v: str, secret_key: str
+) -> Tuple[Any, Any] | None:
     # Load the .env file
     dotenv_path = find_dotenv()
     load_dotenv(dotenv_path)
