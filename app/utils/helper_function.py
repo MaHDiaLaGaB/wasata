@@ -1,9 +1,10 @@
 import logging
 import time
-from typing import Any, Callable, Dict
+from typing import Any, Callable, Dict, Tuple
 from fastapi import status, HTTPException
 from functools import partial
 import re
+import httpx
 import uuid
 import aiocache
 from app.core.config import config
@@ -27,10 +28,10 @@ def snake_case(string: str) -> str:
 
 
 def wait_until_status_code(
-    url: str,
-    code_to_await: int = 200,
-    interval_seconds: float = 1,
-    fail_after_seconds: float = 30,
+        url: str,
+        code_to_await: int = 200,
+        interval_seconds: float = 1,
+        fail_after_seconds: float = 30,
 ) -> None:
     @wait_until_no_assertion_error(interval_seconds, fail_after_seconds)
     def check_result() -> None:
@@ -48,7 +49,7 @@ def wait_until_status_code(
 # fails after fail_after_seconds
 # ----------------------------------------------------------
 def wait_until_no_assertion_error(
-    interval_seconds: float = 0.2, fail_after_seconds: float = 3
+        interval_seconds: float = 0.2, fail_after_seconds: float = 3
 ) -> Any:
     def decorator(func: Callable[[], None]) -> Callable[[], None]:
         start = time.time()
@@ -65,7 +66,8 @@ def wait_until_no_assertion_error(
     return decorator
 
 
-async def payment_getaway(usdt_price: float) -> HTTPException | float:
+# TODO needs to move this function from here
+async def payment_getaway(usdt_price: float, invoice_id: str) -> HTTPException | Tuple[Any, Any, str]:
     # Generate a unique token for the transaction
     transaction_token = str(uuid.uuid4())
 
@@ -75,42 +77,40 @@ async def payment_getaway(usdt_price: float) -> HTTPException | float:
             detail="Duplicate transaction request",
             status_code=status.HTTP_400_BAD_REQUEST,
         )
-    # TODO payment logic should me here
 
-    # Store the token in the cache with an expiration time (e.g., 5 minutes)
+    async with httpx.AsyncClient() as client:
+        # Call the /checkout endpoint
+        checkout_response = await client.post('http://localhost:3000/checkout', json={
+            'amount': usdt_price,
+            'reference': invoice_id,
+        })
+        checkout_data = checkout_response.json()
+
+        # Call the /transactionApproved endpoint
+        approved_response = await client.post('http://localhost:3000/transactionApproved', json={
+            'reference': invoice_id,
+        })
+        approved_data = approved_response.json()
+
+    # Store the token in the cache with an expiration time (e.g., 5 seconds)
     await aiocache_caching.set(transaction_token, True, ttl=5)
-    return usdt_price
+    return approved_data['approved'], checkout_data, invoice_id
 
 
+# ----------------------------------------------------------------
+# Create idempotency key to use to protect us from double requests
+# ----------------------------------------------------------------
 def check_idempotency_key(
-    idempotency_key: str, idempotency_keys: Dict[str, bool]
+        idempotency_key: str, idempotency_keys: Dict[str, bool]
 ) -> bool:
-    """
-    Check if the idempotency key exists in the storage.
-
-    :param idempotency_keys: dict contain the key
-    :param idempotency_key: The idempotency key to check.
-    :return: True if the key exists, False otherwise.
-    """
     return idempotency_key in idempotency_keys
 
 
 def store_idempotency_key(
-    idempotency_key: str, idempotency_keys: Dict[str, bool]
+        idempotency_key: str, idempotency_keys: Dict[str, bool]
 ) -> None:
-    """
-    Store the idempotency key in the storage.
-
-    :param idempotency_keys:
-    :param idempotency_key: The idempotency key to store.
-    """
     idempotency_keys[idempotency_key] = True
 
 
 def create_idempotency_key() -> str:
-    """
-    Generate a new idempotency key.
-
-    :return: A new unique idempotency key.
-    """
     return str(uuid.uuid4())

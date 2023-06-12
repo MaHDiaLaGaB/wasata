@@ -16,5 +16,6 @@ binance-connector
 aiocache
 aioredis
 python-jose
+httpx
 
 
