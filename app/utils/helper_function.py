@@ -82,20 +82,25 @@ async def payment_getaway(usdt_price: float, invoice_id: str) -> HTTPException |
 
     async with httpx.AsyncClient() as client:
         # Call the /checkout endpoint
+
         checkout_response = await client.post('http://moamalat:3000/checkout', json={
+
             'amount': usdt_price,
             'reference': invoice_id,
         })
         checkout_data = checkout_response.json()
 
         # Call the /transactionApproved endpoint
+
         approved_response = await client.post('http://moamalat:3000/transactionApproved', json={
+
             'reference': invoice_id,
         })
         approved_data = approved_response.json()
 
     # Store the token in the cache with an expiration time (e.g., 5 seconds)
     await aiocache_caching.set(transaction_token, True, ttl=5)
+
     logger.info(f"{approved_data} >>> {checkout_data} >>> {invoice_id}")
     return approved_data, checkout_data, invoice_id
 
