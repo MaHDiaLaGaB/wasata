@@ -24,13 +24,18 @@ help:  ##  print help
 
 build-images:  ##  Build all images
 	echo "Building images"
-	cd dev-database && make image-db
+	make start-db
 	make start-api
+	make start-payment
 
 
 start-api:  ## build docker images
 	echo "Building images"
 	docker build -t wasata/api .
+
+start-payment:
+	echo "Building mo3amalat"
+	docker build -t wasata/moamalat ./mo3amalat
 
 start-db:
 	echo "Building database"

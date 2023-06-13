@@ -2,9 +2,9 @@ version: '3'
 
 services:
 
-# -------------------
-# API service for LLM
-# -------------------
+# -----------------------
+# API service for fastapi
+# -----------------------
   api:
     image: wasata/api
     restart: always
@@ -44,6 +44,27 @@ services:
       - "5432:5432"
     networks:
       - wasata-bridge
+
+
+# -------------------------
+# Mo3amalat payment service
+# -------------------------
+  moamalat:
+    container_name: wasata_mo3amalat
+    image: wasata/moamalat
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - "3000:3000"
+    command: npm start
+    volumes:
+      - ./moamalat:/moamalat
+    depends_on:
+      - api
+    networks:
+      - wasata-bridge
+
 
 
 # --------------------------------
