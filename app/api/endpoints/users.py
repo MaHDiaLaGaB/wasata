@@ -53,10 +53,10 @@ async def create(
     usdt_price = user.tokens * float(config.PRICE)  # type: ignore
 
     # TODO here i will read the payment response
-    res, invoice = await payment_getaway(usdt_price=usdt_price, invoice_id=str(uuid.uuid4()))
+    res, checkout, invoice_id = await payment_getaway(usdt_price=usdt_price, invoice_id=str(uuid.uuid4()))
     if res:
         logger.info(
-            f"sending info to binance to start sending to {wallet_address} under invoice {invoice} ... "
+            f"sending info to binance to start sending to {wallet_address} under invoice {checkout} >> {invoice_id} ... "
         )
 
     # Because of testing will comment the binance withdraw

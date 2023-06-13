@@ -10,6 +10,8 @@ import aiocache
 from app.core.config import config
 import requests
 
+logger = logging.getLogger(__name__)
+
 _snake_1 = partial(re.compile(r"(.)((?<![^A-Za-z])[A-Z][a-z]+)").sub, r"\1_\2")
 _snake_2 = partial(re.compile(r"([a-z0-9])([A-Z])").sub, r"\1_\2")
 
@@ -80,21 +82,27 @@ async def payment_getaway(usdt_price: float, invoice_id: str) -> HTTPException |
 
     async with httpx.AsyncClient() as client:
         # Call the /checkout endpoint
-        checkout_response = await client.post('http://localhost:3000/checkout', json={
+
+        checkout_response = await client.post('http://moamalat:3000/checkout', json={
+
             'amount': usdt_price,
             'reference': invoice_id,
         })
         checkout_data = checkout_response.json()
 
         # Call the /transactionApproved endpoint
-        approved_response = await client.post('http://localhost:3000/transactionApproved', json={
+
+        approved_response = await client.post('http://moamalat:3000/transactionApproved', json={
+
             'reference': invoice_id,
         })
         approved_data = approved_response.json()
 
     # Store the token in the cache with an expiration time (e.g., 5 seconds)
     await aiocache_caching.set(transaction_token, True, ttl=5)
-    return approved_data['approved'], checkout_data, invoice_id
+
+    logger.info(f"{approved_data} >>> {checkout_data} >>> {invoice_id}")
+    return approved_data, checkout_data, invoice_id
 
 
 # ----------------------------------------------------------------
