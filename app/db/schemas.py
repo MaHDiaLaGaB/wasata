@@ -1,6 +1,7 @@
+import uuid
 from enum import Enum
 
-from pydantic import BaseModel, EmailStr, PrivateAttr, Field, validator, Extra
+from pydantic import BaseModel, EmailStr, validator, Extra, Field
 from typing import Optional
 from datetime import datetime
 
@@ -27,6 +28,7 @@ class WasataBase(BaseModel):
 
 class UserCreate(WasataBase):
     name: str
+    invoice_id: uuid.UUID
     email: EmailStr
     phone_number: int
     tokens: float
@@ -63,9 +65,18 @@ class UserGet(UserCreate):
 
 
 class AdminCreate(WasataBase):
-    admin_email: EmailStr
-    admin_username: str
-    admin_password: str
-    admin_price: float
-    _value: str = PrivateAttr()
-    value: str = Field(alias="_value")
+    username: str
+    password: str = Field(..., write_only=True)
+
+
+class AdminUpdate(WasataBase):
+    username: Optional[str]
+    password: str = Field(..., write_only=True)
+
+
+# class AdminInDB(AdminCreate):
+#     id: int
+#     api_secret_key: str
+#
+#     class Config:
+#         orm_mode = True

@@ -12,6 +12,9 @@ mo3amalat/node_modules
 .idea/**/dictionaries
 .idea/**/shelf
 
+database.db
+
+deploy/envs
 
 
 # AWS User-specific

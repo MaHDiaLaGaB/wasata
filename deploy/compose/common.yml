@@ -7,15 +7,14 @@ services:
 # -----------------------
   api:
     image: wasata/api
-    restart: always
+    restart: unless-stopped
     container_name: wasata_api
-    env_file:
-      - .env
+    profiles: ["production", "dev", "demo"]
     ports:
-      - "8888:8888"
+      - ${WASATA_PORT}:${WASATA_PORT}
     command: "./entrypoint.sh"
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://api:8888/health"]
+      test: ["CMD", "curl", "-f", "http://api:8080/health"]
       interval: 15s
       retries: 5
     depends_on:
@@ -25,26 +24,23 @@ services:
     volumes:
       - ./app/api:/app/api
 
-
 # -------------------------
 # Postgres database service
 # -------------------------
   dev-postgres:
     image: wasata/dev-postgres
-    restart: always
+    restart: unless-stopped
     container_name: wasata_db
+    profiles: ["production", "demo"]
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}" ]
       interval: 30s
       timeout: 60s
       retries: 5
-    env_file:
-      - .env
     ports:
-      - "5432:5432"
+      - ${POSTGRES_PORT}:${POSTGRES_PORT}
     networks:
       - wasata-bridge
-
 
 # -------------------------
 # Mo3amalat payment service
@@ -52,11 +48,10 @@ services:
   moamalat:
     container_name: wasata_mo3amalat
     image: wasata/moamalat
-    restart: always
-    env_file:
-      - .env
+    profiles: ["production", "dev", "demo"]
+    restart: unless-stopped
     ports:
-      - "3000:3000"
+      - ${MOAMALAT_PORT}:${MOAMALAT_PORT}
     command: npm start
     volumes:
       - ./moamalat:/moamalat
@@ -65,8 +60,6 @@ services:
     networks:
       - wasata-bridge
 
-
-
 # --------------------------------
 # PgAdmin database browser service
 # --------------------------------
@@ -74,6 +67,7 @@ services:
     container_name: wasata_pgadmin
     image: dpage/pgadmin4
     platform: linux/amd64
+    profiles: ["production", "dev", "demo"]
     environment:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgadmin4@pgadmin.org}
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
@@ -81,13 +75,12 @@ services:
     volumes:
        - ./mnt/pgadmin:/var/lib/pgadmin
     ports:
-      - "${PGADMIN_PORT:-5050}:80"
+      - ${PGADMIN_PORT}:${PGADMIN_PORT}
     restart: unless-stopped
     depends_on:
       - dev-postgres
     networks:
       - wasata-bridge
-
 
 # ----------------------------
 # Container log viewer service
@@ -96,6 +89,7 @@ services:
     container_name: wasata_dozzle
     image: amir20/dozzle:latest
     platform: linux/amd64
+    profiles: ["production", "dev", "demo"]
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     ports:

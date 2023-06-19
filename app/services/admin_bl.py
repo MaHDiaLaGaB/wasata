@@ -1,28 +1,21 @@
 from fastapi import Depends
-from app.db.models import Admin
-from app.exceptions import BadRequest
+from app.db.models import Admins
 from app.db.sessions import AdminRepository
-from cryptography.fernet import Fernet
 from app.db.schemas import AdminCreate
-from werkzeug.security import generate_password_hash
 
 
 class AdminBL:
-    def __init__(self, admin_repository: AdminRepository = Depends()) -> None:
+    def __init__(self, admin_repository: AdminRepository = Depends()):
         self.admin_repository = admin_repository
 
-    @staticmethod
-    # TODO add this logic in the makefile
-    def generate_privet_key() -> bytes:
-        privet_secret_key = Fernet.generate_key()
-        return privet_secret_key
+    def create_admin(self, admin_data: AdminCreate) -> Admins:
+        # Check if the admin already exists
+        existing_admin = self.admin_repository.get(admin_data.username)
+        if existing_admin:
+            raise ValueError("Admin already exists")
 
-    def create_admin(self, admin_create: AdminCreate) -> Admin:
-        admin = self.admin_repository.get_by_email(admin_create.admin_email)
-        if admin is None:
-            hashed_password = generate_password_hash(admin_create.admin_password)
-            admin_create.admin_password = hashed_password
-            admin = self.admin_repository.create(admin_create)
-            return admin
-        else:
-            raise BadRequest()
+        # Create the admin
+
+        admin = self.admin_repository.create(admin_data)
+
+        return admin

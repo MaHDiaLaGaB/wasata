@@ -4,7 +4,7 @@ Contains your database models (e.g., SQLAlchemy ORM models) and their relationsh
 import logging
 from dotenv import load_dotenv
 import uuid
-from typing import TYPE_CHECKING, Any, Dict
+from typing import TYPE_CHECKING, Dict
 from cryptography.fernet import Fernet
 from app.utils.types import GUID
 from sqlalchemy.orm import registry
@@ -13,10 +13,10 @@ from sqlalchemy import (
     String,
     DateTime,
     Numeric,
-    LargeBinary,
-    UniqueConstraint,
+    Integer,
     BigInteger,
 )
+import secrets
 from werkzeug.security import generate_password_hash, check_password_hash
 
 if TYPE_CHECKING:
@@ -52,7 +52,7 @@ class Users(UsersBase):  # type: ignore
     __tablename__: str = "users"
 
     id = Column(GUID, primary_key=True, default=uuid.uuid4)
-    _uuid = Column(GUID, unique=True, default=uuid.uuid4)
+    invoice_id = Column(GUID, unique=True, default=uuid.uuid4)
     name = Column(String)
     email = Column(String, nullable=False, unique=True)
     phone_number = Column(BigInteger, nullable=False, unique=True)
@@ -70,43 +70,30 @@ class Users(UsersBase):  # type: ignore
 # ==========================
 
 
-class Admin(UsersBase):  # type: ignore
-    __tablename__ = "admin"
-    id = Column(GUID, primary_key=True, default=uuid.uuid4)
-    admin_email = Column(String, nullable=False, unique=True)
-    admin_username = Column(String)
-    admin_password = Column(String)
-    admin_price = Column(Numeric(9, 4))
-    _value = Column("private_key", LargeBinary, nullable=False)
+class Admins(UsersBase):
+    __tablename__: str = "admins"
 
-    @hybrid_property
-    def value(self) -> str:
-        decrypted = admin_secret_fernet_instance.decrypt(self._value)  # type: ignore
-        return decrypted.decode(encoding="utf-8")
+    id = Column(Integer, primary_key=True, unique=True)
+    username = Column(String(64), index=True, unique=True)
+    _password_hash = Column("password_hash", String(128))
+    api_secret_key = Column(String(128))
 
-    @value.setter
-    def value(self, value: str) -> None:
-        value_bytes = bytes(value, "utf-8")
-        self._value = admin_secret_fernet_instance.encrypt(value_bytes)  # type: ignore
-
-    def __init__(
-        self,
-        admin_email: Any,
-        admin_username: Any,
-        admin_password: Any,
-        admin_price: Any,
-        **kwargs: Any
-    ) -> None:
-        self.admin_email = admin_email
-        self.admin_username = admin_username
-        self.admin_password = generate_password_hash(admin_password)  # type: ignore
-        self.admin_price = admin_price
-        value = kwargs["value"]
-        del kwargs["value"]
+    def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.value = value
+        self.api_secret_key = self.generate_api_secret_key()
 
-    __table_args__ = (UniqueConstraint("admin_username", "admin_price"),)
+    @property
+    def password(self):
+        raise AttributeError("password: write-only field")
 
-    def check_password(self, password: str) -> bool:
-        return check_password_hash(self.admin_password, password)  # type: ignore
+    @password.setter
+    def password(self, password):
+        self._password_hash = generate_password_hash(password)
+
+    def generate_api_secret_key(self):
+        key = bytes.fromhex(config.SECRETS_ENCRYPTION_KEY)
+        f = Fernet(key)
+        return f.encrypt(secrets.token_bytes(16)).decode()
+
+    def check_password(self, password):
+        return check_password_hash(self._password_hash, password)

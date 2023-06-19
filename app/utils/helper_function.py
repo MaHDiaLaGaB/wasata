@@ -1,25 +1,15 @@
 import logging
 import time
-from typing import Any, Callable, Dict, Tuple
-from fastapi import status, HTTPException
+from typing import Any, Callable, Dict
 from functools import partial
 import re
-import httpx
 import uuid
-import aiocache
-from app.core.config import config
 import requests
 
 logger = logging.getLogger(__name__)
 
 _snake_1 = partial(re.compile(r"(.)((?<![^A-Za-z])[A-Z][a-z]+)").sub, r"\1_\2")
 _snake_2 = partial(re.compile(r"([a-z0-9])([A-Z])").sub, r"\1_\2")
-
-aiocache_caching = (
-    aiocache.Cache(aiocache.SimpleMemoryCache)
-    if config.ENVIRONMENT == "dev"
-    else aiocache.Cache(aiocache.RedisCache, endpoint="localhost", port=6379)
-)
 
 
 # ---------------------------------------
@@ -30,10 +20,10 @@ def snake_case(string: str) -> str:
 
 
 def wait_until_status_code(
-        url: str,
-        code_to_await: int = 200,
-        interval_seconds: float = 1,
-        fail_after_seconds: float = 30,
+    url: str,
+    code_to_await: int = 200,
+    interval_seconds: float = 1,
+    fail_after_seconds: float = 30,
 ) -> None:
     @wait_until_no_assertion_error(interval_seconds, fail_after_seconds)
     def check_result() -> None:
@@ -51,7 +41,7 @@ def wait_until_status_code(
 # fails after fail_after_seconds
 # ----------------------------------------------------------
 def wait_until_no_assertion_error(
-        interval_seconds: float = 0.2, fail_after_seconds: float = 3
+    interval_seconds: float = 0.2, fail_after_seconds: float = 3
 ) -> Any:
     def decorator(func: Callable[[], None]) -> Callable[[], None]:
         start = time.time()
@@ -68,54 +58,17 @@ def wait_until_no_assertion_error(
     return decorator
 
 
-# TODO needs to move this function from here
-async def payment_getaway(usdt_price: float, invoice_id: str) -> HTTPException | Tuple[Any, Any, str]:
-    # Generate a unique token for the transaction
-    transaction_token = str(uuid.uuid4())
-
-    # Check if the token exists in the cache
-    if await aiocache_caching.get(transaction_token):
-        return HTTPException(
-            detail="Duplicate transaction request",
-            status_code=status.HTTP_400_BAD_REQUEST,
-        )
-
-    async with httpx.AsyncClient() as client:
-        # Call the /checkout endpoint
-
-        checkout_response = await client.post('http://moamalat:3000/checkout', json={
-
-            'amount': usdt_price,
-            'reference': invoice_id,
-        })
-        checkout_data = checkout_response.json()
-
-        # Call the /transactionApproved endpoint
-
-        approved_response = await client.post('http://moamalat:3000/transactionApproved', json={
-
-            'reference': invoice_id,
-        })
-        approved_data = approved_response.json()
-
-    # Store the token in the cache with an expiration time (e.g., 5 seconds)
-    await aiocache_caching.set(transaction_token, True, ttl=5)
-
-    logger.info(f"{approved_data} >>> {checkout_data} >>> {invoice_id}")
-    return approved_data, checkout_data, invoice_id
-
-
 # ----------------------------------------------------------------
 # Create idempotency key to use to protect us from double requests
 # ----------------------------------------------------------------
 def check_idempotency_key(
-        idempotency_key: str, idempotency_keys: Dict[str, bool]
+    idempotency_key: str, idempotency_keys: Dict[str, bool]
 ) -> bool:
     return idempotency_key in idempotency_keys
 
 
 def store_idempotency_key(
-        idempotency_key: str, idempotency_keys: Dict[str, bool]
+    idempotency_key: str, idempotency_keys: Dict[str, bool]
 ) -> None:
     idempotency_keys[idempotency_key] = True
 

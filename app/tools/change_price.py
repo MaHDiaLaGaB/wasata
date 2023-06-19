@@ -1,39 +1,45 @@
 import os
+import click
 from typing import Tuple, Any
 from app.core.config import config
-
 from dotenv import load_dotenv, find_dotenv
 
 
+@click.command()
+@click.option(
+    "--admin-key",
+    prompt="Please Enter your Admin Secret Key",
+    help="Admin secret key to authorize the update.",
+)
+@click.option(
+    "--usdt-value",
+    prompt="Please enter the new USDT value",
+    help="New USDT value to be set.",
+)
 def create_update_env_variable(
-    k: str, v: str, secret_key: str
+    admin_key: str, usdt_value: str
 ) -> Tuple[Any, Any] | None:
+    """Update the USDT value in the .env file."""
+
     # Load the .env file
     dotenv_path = find_dotenv()
     load_dotenv(dotenv_path)
 
     # Check if secret key matches
-    if secret_key != os.getenv("SECRET_KEY"):
-        raise ValueError()
+    if admin_key != os.getenv("SECRET_KEY"):
+        raise ValueError("Invalid admin secret key")
 
     # Update the environment variable
-    os.environ[k] = v
+    os.environ[config.PRICE] = usdt_value
 
     # Write the variable to the .env file
     with open(dotenv_path, "a") as f:
-        f.write(f"{k}={v}\n")
+        f.write(f"{config.PRICE}={usdt_value}\n")
 
-    return k, v
+    return config.PRICE, usdt_value
 
 
 if __name__ == "__main__":
-    admin_key = input("Please Enter your Admin Secret Key:")
-    print("================================================")
-    print("you are going to change the price of the -> USDT <-")
-    usdt_value = input("Please enter the new USDT value: ")
-    if create_update_env_variable(config.COIN, usdt_value, admin_key) is not None:
-        key, value = create_update_env_variable(config.COIN, usdt_value, admin_key)
-        print("==== the price has been changed successfully ====")
-        print(f"=========> {key}: {value} <=========")
-    else:
-        print("+++++++++++++ Error ++++++++++++")
+    key, value = create_update_env_variable()
+    click.echo("==== the price has been changed successfully ====")
+    click.echo(f"=========> {key}: {value} <=========")

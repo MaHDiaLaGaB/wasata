@@ -13,13 +13,17 @@ TDecorated = TypeVar("TDecorated", bound=Callable[..., Any])  # pylint: disable=
 
 class DB:
     def __init__(self, mapper_registry: Any, connection_string: str) -> None:
-        self.engine = create_engine(
-            connection_string,
-            connect_args={
-                "connect_timeout": config.DB_CONNECTION_TIMEOUT,
-                "options": "-c statement_timeout=10000",
-            },
-            future=True,
+        self.engine = (
+            create_engine(
+                connection_string,
+                connect_args={
+                    "connect_timeout": config.DB_CONNECTION_TIMEOUT,
+                    "options": "-c statement_timeout=10000",
+                },
+                future=True,
+            )
+            if config.ENVIRONMENT == "demo"
+            else create_engine(connection_string)
         )
         self.mapper_registry = mapper_registry
         self._sessionmaker = sessionmaker(
@@ -48,7 +52,7 @@ class DB:
     @contextmanager
     def create_session(self, commit_on_flush: bool = False) -> Any:
         """
-        Create a session in a context manager block, can be configure to run with or without
+        Create a session in a context manager block, can be configured to run with or without
         """
         assert (
             not self._current_session.get()  # type: ignore
@@ -97,12 +101,14 @@ class DB:
 class UserDB(DB):
     def __init__(self) -> None:
         super().__init__(
-            users_mapper_registry,
-            config.DATABASE_URI,
+            mapper_registry=users_mapper_registry,
+            connection_string=config.DATABASE_URI
+            if config.ENVIRONMENT == "demo"
+            else config.DATABASE_URI_DEV,
         )
 
 
-# for now we have a global user db for using inside our app bc dependencies dont work properly
+# for now, we have a global user db for using inside our app bc dependencies don't work properly
 user_db = UserDB()
 
 

@@ -89,4 +89,4 @@ async def openapi(username: str = Depends(get_current_username)) -> Dict[str, An
 if config.ENVIRONMENT == "dev" and __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run(app=app, host="0.0.0.0", port=config.API_PORT)
+    uvicorn.run(app=app, host="0.0.0.0", port=config.WASATA_PORT)
