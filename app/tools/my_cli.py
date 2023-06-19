@@ -1,13 +1,22 @@
 import secrets
-
 import base64
+import click
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptography.hazmat.backends import default_backend
 
 
+@click.command()
+@click.option(
+    "--admin-password",
+    prompt="Please enter your password to create Admin Key",
+    hide_input=True,
+    help="Password to generate the admin key.",
+)
 def generate_secret_key(admin_password: str) -> str:
+    """Generate an admin key based on the provided password."""
+
     admin_password_bytes = admin_password.encode("utf-8")
 
     salt = secrets.token_bytes(16)
@@ -25,9 +34,8 @@ def generate_secret_key(admin_password: str) -> str:
 
 
 if __name__ == "__main__":
-    print("=========== Create Admin Key ===========")
-    admin_pass = input("Please enter your password to create Admin Key: ")
-    the_key = generate_secret_key(admin_password=admin_pass)
-    print("============ Your Admin Key ============")
-    print(f"Your admin key ----> {the_key} <----")
-    print("==== Keep your admin key safe please ===")
+    click.echo("=========== Create Admin Key ===========")
+    admin_key = generate_secret_key()
+    click.echo("============ Your Admin Key ============")
+    click.secho(f"Your admin key ----> {admin_key} <----", fg="green", bold=True)
+    click.echo("==== Keep your admin key safe please ===")

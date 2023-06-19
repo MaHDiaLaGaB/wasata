@@ -1,6 +1,6 @@
 from app.exceptions import BadRequest
 from app.api.dependencies import BinanceWa
-from app.utils.helper_function import payment_getaway, aiocache_caching
+from app.services.payments import aiocache_caching, payment_getaway
 import asyncio
 import pytest
 

@@ -8,10 +8,9 @@ from http import HTTPStatus
 
 from app.core.config import config
 from app.services.user_bl import UserBL
+from app.services.payments import payment_getaway
 from app.api.dependencies import BinanceWa
 from app.exceptions import BadRequest, AdminTokenRunOut
-
-from app.utils.helper_function import payment_getaway
 
 logger = logging.getLogger(__name__)
 
@@ -34,17 +33,19 @@ async def create(
         )
 
     user.status = StatusEntity.ACTIVE
+    user.invoice_id = uuid.uuid4()
 
     # check the binance wallet and account is active and not blocked
     if not binance_end.check_account():
-        raise BadRequest()
+        raise BadRequest(description="the account is not active")
 
     # check if user usdt request is more than wasata balance
     balance = binance_end.get_balance(coin=config.COIN)
     if balance:
-        print(balance[config.COIN])
         if float(balance[config.COIN]) <= user.tokens:
-            raise AdminTokenRunOut()
+            raise AdminTokenRunOut(
+                description="Wasata's money is low please recharge your wallet"
+            )
 
     logging.info(f"Adding new user ")
     if user.tokens <= 0:
@@ -53,13 +54,15 @@ async def create(
     usdt_price = user.tokens * float(config.PRICE)  # type: ignore
 
     # TODO here i will read the payment response
-    res, checkout, invoice_id = await payment_getaway(usdt_price=usdt_price, invoice_id=str(uuid.uuid4()))
+    res, checkout, invoice_id = await payment_getaway(
+        usdt_price=usdt_price, invoice_id=str(user.invoice_id)
+    )
     if res:
         logger.info(
             f"sending info to binance to start sending to {wallet_address} under invoice {checkout} >> {invoice_id} ... "
         )
 
-    # Because of testing will comment the binance withdraw
+    # TODO Because of testing will comment the binance withdraw
     # binance_end.withdraw(coin=config.COIN, amount=user.tokens, to_address=wallet_address, network=None)
 
     user.price = usdt_price  # type: ignore

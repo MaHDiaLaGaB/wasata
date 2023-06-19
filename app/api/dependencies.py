@@ -73,7 +73,7 @@ class BinanceWa:
                 x = res["balances"]
                 for asset in x:
                     if asset["asset"] == coin:
-                        logger.info(f"{asset['asset']}: {float(asset['free'])}")
+                        logger.info(f"my {asset['asset']}: {float(asset['free'])}")
                         return dict({f"{asset['asset']}": float(f"{asset['free']}")})
             else:
                 logger.error("system error ...")

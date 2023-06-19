@@ -3,9 +3,9 @@ Manages database connections and sessions.
 """
 from typing import Any
 
-from .models import Users, UsersBase, Admin
+from .models import Users, UsersBase, Admins
 
-from .schemas import UserCreate, WasataBase, AdminCreate, UserUpdate
+from .schemas import UserCreate, WasataBase, AdminCreate, UserUpdate, AdminUpdate
 from fastapi import Depends
 
 from app.exceptions import ObjectNotFound
@@ -38,6 +38,9 @@ class BaseRepository:
         self.db.session.add(entity)
         self.db.flush()
         return entity
+
+    def _get_by_api_secret_key(self, api_secret_key: str) -> Admins:
+        return self._get_one(Admins, api_secret_key=api_secret_key)
 
     def _get_by_id(self, model: Type[T], entity_id: UUID) -> T:
         entity = self.db.session.query(model).get(entity_id)
@@ -103,32 +106,31 @@ class UserRepository(BaseRepository):
 
 
 class AdminRepository(BaseRepository):
-    def get_by_email(self, email: str) -> Admin | None:
-        admin = (
-            self.db.session.query(Admin)
-            .filter((func.lower(Admin.admin_email) == email.lower()))
+    def get_by_secret(self, secret: str):
+        return self._get_by_api_secret_key(secret)
+
+    def get(self, username: str):
+        db_admin = (
+            self.db.session.query(Admins)
+            .filter((func.lower(Admins.username) == username.lower()))
             .one_or_none()
         )
-        if admin is None:
-            logging.info(f"There is no user with email: {email}")
+        if db_admin is None:
+            logging.info("You are new admin ... WELCOME")
             return None
+        return cast(Admins, db_admin)
 
-        return cast(Admin, admin)
+    def create(self, admin_create: AdminCreate) -> Admins:
+        admin_db = Admins(**admin_create.dict())
+        return self._create(admin_db)
 
-    def create(self, admin_create: AdminCreate) -> Admin:
-        admin = Admin(**admin_create.dict())
-        return self._create(admin)
+    def update(self, admin: AdminUpdate, id: Union[int, UUID]):
+        db_admin = self._get_by_id(Admins, id)
+        updated_admin = self._update_model_from_schema(db_admin, admin)
+        self.db.commit()
+        return updated_admin
 
-    # def update_price(self, admin_value, new_price) -> Admin | None:
-    #     admin = (
-    #         self.db.session.query(Admin).filter_by(Admin.value == admin_value).first()
-    #     )
-    #     if admin:
-    #         admin.admin_price = new_price
-    #         self.db.commit()
-    #         self.db.session.refresh(admin)
-    #         self.db.flush()
-    #         return admin
-    #     else:
-    #         logger.error("You are not the admin please try again")
-    #         raise NotFound
+    def delete(self, id: Union[int, UUID]):
+        db_admin = self._get_by_id(Admins, id)
+        self._delete(db_admin)
+        self.db.commit()
