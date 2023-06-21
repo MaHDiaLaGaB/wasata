@@ -69,7 +69,9 @@ class UserBL:
             logger.info("the user already exist ...")
             user = self.user_repository.update(
                 user=user,
-                user_update=UserUpdate(tokens=user_create.tokens, price=config.PRICE),
+                user_update=UserUpdate(
+                    tokens=user_create.tokens, price=float(config.PRICE)
+                ),
             )
 
             return user

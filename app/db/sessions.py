@@ -1,7 +1,7 @@
 """
 Manages database connections and sessions.
 """
-from typing import Any
+from typing import Any, Type
 
 from .models import Users, UsersBase, Admins
 
@@ -39,8 +39,7 @@ class BaseRepository:
         self.db.flush()
         return entity
 
-    def _get_by_api_secret_key(self, api_secret_key: str) -> Admins:
-        return self._get_one(Admins, api_secret_key=api_secret_key)
+
 
     def _get_by_id(self, model: Type[T], entity_id: UUID) -> T:
         entity = self.db.session.query(model).get(entity_id)
@@ -106,10 +105,16 @@ class UserRepository(BaseRepository):
 
 
 class AdminRepository(BaseRepository):
-    def get_by_secret(self, secret: str):
-        return self._get_by_api_secret_key(secret)
+    def get_by_secret(self, api_secret_key: str) -> Admins:
+        return self._get_one(Admins, api_secret_key=api_secret_key)
 
-    def get(self, username: str):
+    def _get_usdt_price(self, model: Type[T], **kwargs: Union[str, UUID]) -> float:
+        entity = self.db.session.query(model).filter_by(**kwargs).one_or_none()
+        if not entity:
+            raise ObjectNotFound()
+        return entity.usdt_price
+
+    def get(self, username: str) -> Union[Admins, None]:
         db_admin = (
             self.db.session.query(Admins)
             .filter((func.lower(Admins.username) == username.lower()))
@@ -124,13 +129,10 @@ class AdminRepository(BaseRepository):
         admin_db = Admins(**admin_create.dict())
         return self._create(admin_db)
 
-    def update(self, admin: AdminUpdate, id: Union[int, UUID]):
-        db_admin = self._get_by_id(Admins, id)
-        updated_admin = self._update_model_from_schema(db_admin, admin)
-        self.db.commit()
-        return updated_admin
+    def update(self, admins: Admins, admin_update: AdminUpdate) -> Admins:
+        return self._update_model_from_schema(admins, admin_update)
 
-    def delete(self, id: Union[int, UUID]):
+    def delete(self, id: UUID) -> None:
         db_admin = self._get_by_id(Admins, id)
         self._delete(db_admin)
         self.db.commit()

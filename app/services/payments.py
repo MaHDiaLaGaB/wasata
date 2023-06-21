@@ -18,15 +18,13 @@ aiocache_caching = (
 # TODO needs to return a custom exceptions from moamalat microservice
 
 
-async def payment_getaway(
-    usdt_price: float, invoice_id: str
-) -> HTTPException | Tuple[Any, Any, str]:
+async def payment_getaway(usdt_price: float, invoice_id: str) -> Tuple[Any, Any, str]:
     # generate a unique token for the transaction
     transaction_token = str(uuid.uuid4())
 
     # check if the token exists in the cache
     if await aiocache_caching.get(transaction_token):
-        return HTTPException(
+        raise HTTPException(
             detail="Duplicate transaction request",
             status_code=status.HTTP_400_BAD_REQUEST,
         )

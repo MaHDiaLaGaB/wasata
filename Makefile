@@ -66,22 +66,12 @@ stop:
 # ------------------------------- Database Locally-----------------------------------
 #
 # development
-db-create-revision-dev:  ## create alembic revision for development database
-	alembic -c alembic-dev.ini revision --autogenerate -m "$(title)"
+db-create-revision:  ## create alembic revision for development database
+	alembic -c alembic.ini revision --autogenerate -m "$(title)"
 
-db-create-migration-dev:  ## create alembic database migrations in development
-	alembic -c alembic-dev.ini upgrade head
+db-create-migration:  ## create alembic database migrations in development
+	alembic -c alembic.ini upgrade head
 
-
-#
-# ---------------------------- Database Production & Demo----------------------------
-#
-# production
-db-create-revision-demo:  ## create alembic revision for production database
-	alembic -c alembic-demo.ini revision --autogenerate -m "$(title)"
-
-db-create-migration-demo:  ## create alembic database migrations in production
-	alembic -c alembic-demo.ini upgrade head
 
 #
 # --------------------------- Formatting & Linting ---------------------------
