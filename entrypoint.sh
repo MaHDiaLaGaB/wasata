@@ -25,18 +25,9 @@ execute_alembic_command() {
   done
 }
 
-# Determine the environment and set the appropriate Alembic config file
-if [ "$ENVIRONMENT" = "dev" ]; then
-  alembic_config="alembic-dev.ini"
-elif [ "$ENVIRONMENT" = "demo" ]; then
-  alembic_config="alembic-demo.ini"
-else
-  echo "Invalid environment: $ENVIRONMENT. Please set ENV to 'dev' or 'demo'."
-  exit 1
-fi
 
 # Execute alembic upgrade head command with retry
-execute_alembic_command "alembic -c $alembic_config upgrade head" 3
+execute_alembic_command "alembic -c alembic.ini upgrade head" 3
 
 # Start the server
 uvicorn app.server:app --host 0.0.0.0 --port "${WASATA_PORT}" --reload

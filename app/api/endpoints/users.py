@@ -51,7 +51,7 @@ async def create(
     if user.tokens <= 0:
         raise ValueError("Price must be greater than 0")
 
-    usdt_price = user.tokens * float(config.PRICE)  # type: ignore
+    usdt_price = user.tokens * float(config.PRICE)
 
     # TODO here i will read the payment response
     res, checkout, invoice_id = await payment_getaway(
@@ -62,7 +62,7 @@ async def create(
             f"sending info to binance to start sending to {wallet_address} under invoice {checkout} >> {invoice_id} ... "
         )
 
-    # TODO Because of testing will comment the binance withdraw
+    # TODO Because of testing, will comment the binance withdraw
     # binance_end.withdraw(coin=config.COIN, amount=user.tokens, to_address=wallet_address, network=None)
 
     user.price = usdt_price  # type: ignore

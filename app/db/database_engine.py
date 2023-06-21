@@ -13,17 +13,13 @@ TDecorated = TypeVar("TDecorated", bound=Callable[..., Any])  # pylint: disable=
 
 class DB:
     def __init__(self, mapper_registry: Any, connection_string: str) -> None:
-        self.engine = (
-            create_engine(
-                connection_string,
-                connect_args={
-                    "connect_timeout": config.DB_CONNECTION_TIMEOUT,
-                    "options": "-c statement_timeout=10000",
-                },
-                future=True,
-            )
-            if config.ENVIRONMENT == "demo"
-            else create_engine(connection_string)
+        self.engine = create_engine(
+            connection_string,
+            connect_args={
+                "connect_timeout": config.DB_CONNECTION_TIMEOUT,
+                "options": "-c statement_timeout=10000",
+            },
+            future=True,
         )
         self.mapper_registry = mapper_registry
         self._sessionmaker = sessionmaker(
@@ -101,10 +97,7 @@ class DB:
 class UserDB(DB):
     def __init__(self) -> None:
         super().__init__(
-            mapper_registry=users_mapper_registry,
-            connection_string=config.DATABASE_URI
-            if config.ENVIRONMENT == "demo"
-            else config.DATABASE_URI_DEV,
+            mapper_registry=users_mapper_registry, connection_string=config.DATABASE_URI
         )
 
 

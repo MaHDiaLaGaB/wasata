@@ -9,6 +9,7 @@ from dotenv import load_dotenv, find_dotenv
 @click.option(
     "--admin-key",
     prompt="Please Enter your Admin Secret Key",
+    hide_input=True,
     help="Admin secret key to authorize the update.",
 )
 @click.option(
@@ -30,13 +31,13 @@ def create_update_env_variable(
         raise ValueError("Invalid admin secret key")
 
     # Update the environment variable
-    os.environ[config.PRICE] = usdt_value
+    os.environ["PRICE"] = usdt_value
 
     # Write the variable to the .env file
-    with open(dotenv_path, "a") as f:
-        f.write(f"{config.PRICE}={usdt_value}\n")
+    # with open(dotenv_path, "a") as f:
+    #     f.write(f"PRICE={usdt_value}\n")
 
-    return config.PRICE, usdt_value
+    return "PRICE", usdt_value
 
 
 if __name__ == "__main__":

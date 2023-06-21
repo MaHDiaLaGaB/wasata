@@ -32,6 +32,10 @@ class UserCreate(WasataBase):
     email: EmailStr
     phone_number: int
     tokens: float
+    status: StatusEntity = Field()
+
+    class Config:
+        exclude = {"status"}
 
     @validator("name")
     def validate_name(cls, name: str) -> str:
@@ -61,21 +65,22 @@ class UserUpdate(WasataBase):
 class UserGet(UserCreate):
     created_at: datetime
     price: float
-    status: str = StatusEntity.INACTIVE
+    status: StatusEntity
 
 
 class AdminCreate(WasataBase):
     username: str
     password: str = Field(..., write_only=True)
+    usdt_price: float
 
 
 class AdminUpdate(WasataBase):
-    username: Optional[str]
-    password: str = Field(..., write_only=True)
+    usdt_price: float | None
 
 
 # class AdminInDB(AdminCreate):
 #     id: int
+#     password: str = Field(..., write_only=True)
 #     api_secret_key: str
 #
 #     class Config:

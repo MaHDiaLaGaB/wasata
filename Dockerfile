@@ -30,8 +30,7 @@ COPY dev-database /wasata/dev-database
 
 
 # Make the entrypoint script executable
-COPY alembic-demo.ini /wasata/alembic-demo.ini
-COPY alembic-dev.ini /wasata/alembic-dev.ini
+COPY alembic.ini /wasata/alembic.ini
 
 COPY .env /wasata/.env
 COPY Makefile /wasata/Makefile

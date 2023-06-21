@@ -1,22 +1,10 @@
 import logging
 import time
 from typing import Any, Callable, Dict
-from functools import partial
-import re
 import uuid
 import requests
 
 logger = logging.getLogger(__name__)
-
-_snake_1 = partial(re.compile(r"(.)((?<![^A-Za-z])[A-Z][a-z]+)").sub, r"\1_\2")
-_snake_2 = partial(re.compile(r"([a-z0-9])([A-Z])").sub, r"\1_\2")
-
-
-# ---------------------------------------
-# Convert to snake casing (for DB models)
-# ---------------------------------------
-def snake_case(string: str) -> str:
-    return _snake_2(_snake_1(string)).casefold()
 
 
 def wait_until_status_code(

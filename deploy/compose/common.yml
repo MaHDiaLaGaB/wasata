@@ -31,7 +31,7 @@ services:
     image: wasata/dev-postgres
     restart: unless-stopped
     container_name: wasata_db
-    profiles: ["production", "demo"]
+    profiles: ["production", "demo", "dev"]
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}" ]
       interval: 30s
@@ -53,8 +53,6 @@ services:
     ports:
       - ${MOAMALAT_PORT}:${MOAMALAT_PORT}
     command: npm start
-    volumes:
-      - ./moamalat:/moamalat
     depends_on:
       - api
     networks:
@@ -72,8 +70,6 @@ services:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgadmin4@pgadmin.org}
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
       PGADMIN_CONFIG_SERVER_MODE: 'False'
-    volumes:
-       - ./mnt/pgadmin:/var/lib/pgadmin
     ports:
       - ${PGADMIN_PORT}:${PGADMIN_PORT}
     restart: unless-stopped

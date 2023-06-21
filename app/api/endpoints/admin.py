@@ -3,25 +3,44 @@
 """
 import logging
 
-from fastapi import APIRouter, status, Depends
+from fastapi import APIRouter, Depends, HTTPException, Security
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
+import secrets
+from http import HTTPStatus
+from app.db.sessions import AdminRepository
+from app.db.schemas import AdminCreate, AdminUpdate
+from app.db.models import Admins
 
-from app.db.schemas import AdminCreate
 from app.services.admin_bl import AdminBL
 from app.exceptions import Forbidden
 from app.core.config import config
-from .routes import ADMIN
+from .routes import ADMIN, UPDATE_USDT
+
+security = HTTPBasic()
 
 logger = logging.getLogger(__name__)
 
 route = APIRouter(tags=["admin"])
 
 
-@route.post(ADMIN, include_in_schema=True, status_code=status.HTTP_201_CREATED)
+@route.post(ADMIN, include_in_schema=True, status_code=HTTPStatus.CREATED)
 def admin_endpoint(
-    *, api_key: str, admin_create: AdminCreate, admin_bl: AdminBL = Depends()
+    *, secret_key: str, admin_create: AdminCreate, admin_bl: AdminBL = Depends()
 ):
-    if config.SECRETS_ENCRYPTION_KEY != api_key:
-        raise Forbidden(description="FUCK OFF.. YOU ARE NOT THE ADMIN")
+    if config.SECRETS_ENCRYPTION_KEY != secret_key:
+        raise Forbidden(description="Tik Tok.. Try Again")
 
     logger.info("Craeting admin ... ")
-    return admin_bl.create_admin(admin_data=admin_create)
+    return admin_bl.create_admin(admin_create=admin_create)
+
+
+@route.put(UPDATE_USDT, include_in_schema=True, status_code=HTTPStatus.OK)
+def update_usdt_price(
+    *,
+    admin_update: AdminUpdate,
+    secret_key: str,
+    admin_bl: AdminBL = Depends(),
+) -> float:
+
+    updated_price = admin_bl.update_price_admin(secret_key=secret_key, admin_update=admin_update)
+    return updated_price.usdt_price

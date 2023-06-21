@@ -8,7 +8,7 @@ from fastapi.openapi.docs import get_swagger_ui_html, get_redoc_html
 from fastapi.openapi.utils import get_openapi
 from starlette.responses import HTMLResponse
 
-from app.api.endpoints import health, users, admin
+from app.api.endpoints import health, users, admin, routes
 from app.core.logg import setup_logging
 from app.core.config import config
 from app.db.database_engine import UserDB, get_user_db
@@ -61,25 +61,25 @@ app.include_router(users.route)
 app.include_router(admin.route)
 
 
-@app.get("/docs", include_in_schema=False)
+@app.get(routes.DOCS, include_in_schema=False)
 async def get_swagger_documentation(
     username: str = Depends(get_current_username),
 ) -> HTMLResponse:
     if not username:
         raise Forbidden()
-    return get_swagger_ui_html(openapi_url="/openapi.json", title="docs")
+    return get_swagger_ui_html(openapi_url=routes.OPENAPI, title="docs")
 
 
-@app.get("/redoc", include_in_schema=False)
+@app.get(routes.REDOC, include_in_schema=False)
 async def get_redoc_documentation(
     username: str = Depends(get_current_username),
 ) -> HTMLResponse:
     if not username:
         raise Forbidden()
-    return get_redoc_html(openapi_url="/openapi.json", title="docs")
+    return get_redoc_html(openapi_url=routes.OPENAPI, title="docs")
 
 
-@app.get("/openapi.json", include_in_schema=False)
+@app.get(routes.OPENAPI, include_in_schema=False)
 async def openapi(username: str = Depends(get_current_username)) -> Dict[str, Any]:
     if not username:
         raise Forbidden()
