@@ -3,3 +3,5 @@ pytest
 databases
 httpx
 mypy
+pytest-asyncio
+testing.postgresql
