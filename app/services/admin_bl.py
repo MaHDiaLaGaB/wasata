@@ -21,9 +21,7 @@ class AdminBL:
 
         return admin
 
-    def update_price_admin(
-        self, secret_key: str, admin_update: AdminUpdate
-    ):
+    def update_price_admin(self, secret_key: str, admin_update: AdminUpdate):
         admin = self.admin_repository.get_by_secret(secret_key)
         if not admin:
             raise Forbidden()
