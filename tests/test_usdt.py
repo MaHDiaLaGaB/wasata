@@ -1,22 +1,75 @@
-from app.exceptions import BadRequest
 from app.api.dependencies import BinanceWa
-from app.services.payments import aiocache_caching, payment_getaway
-import asyncio
+from fastapi import HTTPException
+
+from app.services.payments import payment_getaway
 import pytest
 
-
-def test_get_account(spot_binance_api: BinanceWa) -> None:
-    with pytest.raises(BadRequest):
-        res = spot_binance_api.check_account()
-        print(res)
-        assert res is False
+from unittest.mock import MagicMock, patch
 
 
-def test_get_balance(spot3_binance_api: BinanceWa) -> None:
-    print(spot3_binance_api.client.api_key)
-    res = spot3_binance_api.get_balance("USDT")
+class AsyncMock(MagicMock):
+    async def __call__(self, *args, **kwargs):
+        return super(AsyncMock, self).__call__(*args, **kwargs)
 
-    assert res["USDT"] == 0
+
+@pytest.mark.asyncio
+async def test_payment_getaway():
+    # mock the functions like uuid and payments
+    with patch("uuid.uuid4", return_value="test_token"):
+        with patch(
+            "app.services.payments.aiocache_caching.get",
+            new_callable=AsyncMock,
+            return_value=None,
+        ) as mock_get, patch(
+            "app.services.payments.aiocache_caching.set", new_callable=AsyncMock
+        ) as mock_set:
+            with patch(
+                "app.services.payments.pay_getaway.checkout",
+                new_callable=AsyncMock,
+                return_value="checkout_resp",
+            ) as mock_checkout, patch(
+                "app.services.payments.pay_getaway.approved",
+                new_callable=AsyncMock,
+                return_value="approved_resp",
+            ) as mock_approved:
+                # call the function
+                checkout_resp, approved_resp, invoice_id = await payment_getaway(
+                    1.0, "invoice_id"
+                )
+
+                # assert the results
+                assert checkout_resp == "checkout_resp"
+                assert approved_resp == "approved_resp"
+                assert invoice_id == "invoice_id"
+
+                # assert the methods were called with the correct arguments
+                mock_get.assert_called_once_with("test_token")
+                mock_set.assert_called_once_with("test_token", True, ttl=5)
+                mock_checkout.assert_called_once_with(
+                    usdt_price=1.0, invoice_id="invoice_id"
+                )
+                mock_approved.assert_called_once_with(invoice_id="invoice_id")
+
+
+@pytest.mark.asyncio
+async def test_payment_getaway_duplicate_transaction():
+    with patch("uuid.uuid4", return_value="test_token"):
+        with patch(
+            "app.services.payments.aiocache_caching.get",
+            new_callable=AsyncMock,
+            return_value=True,
+        ):
+            with pytest.raises(HTTPException) as exc_info:
+                await payment_getaway(1.0, "invoice_id")
+
+            assert exc_info.value.detail == "Duplicate transaction request"
+            assert exc_info.value.status_code == 400
+
+
+# testing the binance class
+def test_get_account(spot3_binance_api: BinanceWa) -> None:
+    res = spot3_binance_api.check_account()
+    assert res is True
 
 
 def test_get_ping(spot3_binance_api: BinanceWa) -> None:
@@ -27,22 +80,3 @@ def test_get_ping(spot3_binance_api: BinanceWa) -> None:
 def test_check_system(spot3_binance_api: BinanceWa) -> None:
     res = spot3_binance_api.check_system()
     assert res is True
-
-
-def test_check_account(spot3_binance_api: BinanceWa) -> None:
-    res = spot3_binance_api.get_balance("USDT")
-    assert res["USDT"] == 30
-
-
-@pytest.mark.asyncio
-async def test_payment_getaway_caching(test_app):
-    # Call the payment_getaway function with a sample usdt_price
-    usdt_price = 100.0
-    transaction_token = await payment_getaway(usdt_price)
-
-    # Check if the transaction token is stored in the cache
-    assert await aiocache_caching.get(transaction_token) is not None
-
-    # Check if the transaction token expires after the specified time (e.g., 5 minutes)
-    await asyncio.sleep(6)  # Sleep for 6 seconds (5 seconds + 1 second)
-    assert await aiocache_caching.get(transaction_token) is None

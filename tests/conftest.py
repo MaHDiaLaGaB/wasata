@@ -1,70 +1,60 @@
 import pytest
-from fastapi.testclient import TestClient
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from databases import Database
-import requests
+from sqlalchemy.orm import Session
+from typing import Generator, Any
+from starlette.testclient import TestClient
 from app.server import app
-from unittest.mock import patch
-from app.core.config import config
+
+from app.services.payments import PaymentGetaway
 from app.api.dependencies import BinanceWa
-
-
-DATABASE_URL = "postgresql://user:password@localhost/test_db"
-
-
-@pytest.fixture(scope="module")
-def test_app():
-    client = TestClient(app)
-    yield client
-
-
-@pytest.fixture(scope="module")
-def mock_db_client():
-    with patch("app.main.db") as mock_db:
-        yield mock_db
+from app.db.database_engine import UserDB
+from app.db.sessions import UserRepository, AdminRepository
+from app.services.user_bl import UserBL
+from app.services.admin_bl import AdminBL
 
 
 @pytest.fixture
-def spot_binance_api():
-    base_url = config.TEST_BINANCE_URL
-    binance_class = BinanceWa(base_url=base_url)
-    yield binance_class
+def client() -> TestClient:
+    return TestClient(app)
+
+
+user_db = UserDB()
+
+
+@pytest.fixture(autouse=True)
+def run_around_tests() -> Generator[Any, Any, Any]:
+    user_db.reset()
+    yield
+    user_db.reset()
+
+
+@pytest.fixture(autouse=True)
+def user_db_session() -> Session:
+    with user_db.create_session(commit_on_flush=True):
+        yield user_db.session
+
+
+@pytest.fixture()
+def user_repository() -> UserRepository:
+    return UserRepository(user_db)
+
+
+@pytest.fixture()
+def admin_repository() -> AdminRepository:
+    return AdminRepository(user_db)
+
+
+@pytest.fixture()
+def user_bl(user_repository: UserRepository) -> UserBL:
+    return UserBL(user_repository)
+
+
+@pytest.fixture()
+def admin_bl(admin_repository: AdminRepository) -> AdminBL:
+    return AdminBL(admin_repository)
 
 
 # this for spot3
 @pytest.fixture
 def spot3_binance_api():
-    base_url = config.BINANCE_BASE_URL
-    binance_class = BinanceWa(base_url=base_url)
+    binance_class = BinanceWa()
     yield binance_class
-
-
-# @pytest.fixture(scope="module")
-# def test_db():
-#     engine = create_engine(DATABASE_URL)
-#     TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-#     BaseModel.metadata.create_all(bind=engine)
-#
-#     def override_get_db():
-#         db = TestingSessionLocal()
-#         try:
-#             yield db
-#         finally:
-#             db.close()
-#
-#     app.dependency_overrides[get_engine()] = override_get_db
-#
-#     yield engine
-#
-#     BaseModel.metadata.drop_all(bind=engine)
-#
-#
-# @pytest.fixture(scope="function")
-# async def test_async_db():
-#     async_db = Database(DATABASE_URL)
-#     await async_db.connect()
-#
-#     yield async_db
-#
-#     await async_db.disconnect()
