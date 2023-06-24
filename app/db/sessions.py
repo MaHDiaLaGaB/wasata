@@ -30,7 +30,7 @@ class BaseRepository:
     """
 
     def __init__(
-            self, db: UserDB = Depends(get_user_db)  # pylint: disable=C0103
+        self, db: UserDB = Depends(get_user_db)  # pylint: disable=C0103
     ) -> None:
         self.db = db  # pylint: disable=C0103
 
@@ -52,7 +52,7 @@ class BaseRepository:
         return cast(T, entity)
 
     def _get_first(
-            self, model: Type[T], order_by: Any = None, **kwargs: Union[str, UUID, bool]
+        self, model: Type[T], order_by: Any = None, **kwargs: Union[str, UUID, bool]
     ) -> T:
         query = self.db.session.query(model).filter_by(**kwargs)
         if order_by is not None:
