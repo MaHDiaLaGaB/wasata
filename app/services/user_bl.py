@@ -59,22 +59,22 @@ class UserBL:
         #         return user
         #     except ObjectNotFound:
         #         pass
-        user = self.user_repository.get_by_email(user_create.email)
+        user = self.user_repository.get_by_number(user_create.phone_number)
         if user is None:
             user = self.user_repository.create(user_create)
 
             return user
 
-        else:
-            logger.info("the user already exist ...")
-            user = self.user_repository.update(
-                user=user,
-                user_update=UserUpdate(
-                    tokens=user_create.tokens, price=float(config.PRICE)
-                ),
-            )
-
-            return user
+        # else:
+        #     logger.info("the user already exist ...")
+        #     user = self.user_repository.update(
+        #         user=user,
+        #         user_update=UserUpdate(
+        #             tokens=user_create.tokens, price=float(config.PRICE)
+        #         ),
+        #     )
+        #
+        #     return user
         # if user with this auth id exists, just return it
         # try:
         #     return self.user_repository.get_by_auth_id(user_create.auth_id or "not set")

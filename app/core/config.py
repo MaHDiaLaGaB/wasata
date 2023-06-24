@@ -1,7 +1,6 @@
 import os
 from dotenv import load_dotenv
 from .base_configuration import BaseConfig
-from typing import Any
 
 load_dotenv()
 
@@ -34,7 +33,6 @@ class Config(BaseConfig):
     BINANCE_API_KEY = os.getenv("BINANCE_API_KEY", "")
     BINANCE_BASE_URL = os.getenv("BINANCE_BASE_URL", "")
     COIN = os.getenv("COIN", "USDT")
-    PRICE: float = os.getenv("PRICE")
 
     # test binance
     TEST_BINANCE_URL = os.getenv("TEST_BINANCE_URL", "")
@@ -42,8 +40,9 @@ class Config(BaseConfig):
     TEST_BINANCE_SECRET_API = os.getenv("TEST_BINANCE_SECRET_API", "")
 
     # mo3amalat
-    MO3AMALAT_CHECKOUT = os.getenv("MOAMALAT_CHECKOUT", "")
-    MOAMALAT_TRANSACTIONS_APPROVED = os.getenv("MOAMALAT_TRANSACTIONS_APPROVED", "")
+    MO3AMALAT_HOST = os.getenv("MOAMALAT_HOST", "localhost")
+    MO3AMALAT_CHECKOUT = os.getenv("MOAMALAT_CHECKOUT")
+    MOAMALAT_TRANSACTIONS_APPROVED = os.getenv("MOAMALAT_TRANSACTIONS_APPROVED")
 
     class Config:
         env_file = ".env"

@@ -3,15 +3,12 @@ services:
 
 # platform-services
   api:
-    environment:
-      - WASATA_PORT
     env_file:
       - ../envs/dev.env
   moamalat:
     env_file:
       - ../envs/dev.env
 
-# dev-services
   dev-postgres:
     env_file:
       - ../envs/dev.env

@@ -39,8 +39,6 @@ class BaseRepository:
         self.db.flush()
         return entity
 
-
-
     def _get_by_id(self, model: Type[T], entity_id: UUID) -> T:
         entity = self.db.session.query(model).get(entity_id)
         if not entity:
@@ -87,6 +85,13 @@ class UserRepository(BaseRepository):
     def get(self, user_id: UUID) -> Users:
         return self._get_by_id(Users, user_id)
 
+    # TODO catsh the error and do something
+    def get_by_number(self, phone_number: str) -> Users | None:
+        try:
+            return self._get_one(Users, phone_number=phone_number)
+        except ObjectNotFound:
+            return None
+
     def get_by_email(self, email: str) -> Users | None:
         user = (
             self.db.session.query(Users)
@@ -108,6 +113,10 @@ class AdminRepository(BaseRepository):
     def get_by_secret(self, api_secret_key: str) -> Admins:
         return self._get_one(Admins, api_secret_key=api_secret_key)
 
+    def get_admin_usdt_price_by_username(self, username: str) -> float:
+        admin = self._get_one(Admins, username=username)
+        return admin.usdt_price
+
     def _get_usdt_price(self, model: Type[T], **kwargs: Union[str, UUID]) -> float:
         entity = self.db.session.query(model).filter_by(**kwargs).one_or_none()
         if not entity:
@@ -126,6 +135,9 @@ class AdminRepository(BaseRepository):
         return cast(Admins, db_admin)
 
     def create(self, admin_create: AdminCreate) -> Admins:
+        num_of_admins = self.db.session.query(Admins).count()
+        if num_of_admins > 1:
+            raise Exception("maximum number of admins reached")
         admin_db = Admins(**admin_create.dict())
         return self._create(admin_db)
 

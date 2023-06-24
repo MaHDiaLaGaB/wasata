@@ -14,19 +14,11 @@ logger = logging.getLogger(__name__)
 
 
 class BinanceWa:
-    def __init__(self, base_url: str) -> None:
-        self.base_url = base_url
-        logger.info("it's working")
-        if self.base_url == config.TEST_BINANCE_URL:
-            self.client = Client(
-                api_key=config.TEST_BIBANCE_API_KEY,
-                api_secret=config.TEST_BINANCE_SECRET_API,
-                base_url=self.base_url,
-            )
+    def __init__(self) -> None:
         self.client = Client(
             api_key=config.BINANCE_API_KEY,
             api_secret=config.BINANCE_SECRETE_KEY,
-            base_url=self.base_url,
+            base_url=config.BINANCE_BASE_URL,
         )
 
     def check_connection(self) -> bool:

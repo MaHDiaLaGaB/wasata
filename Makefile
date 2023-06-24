@@ -45,7 +45,7 @@ build-db:  ## build database image
 dev-start-db:
 	docker run wasata/dev-postgres
 
-dev-start:  ## build docker containers for dev environment
+test-start:  ## build docker containers for dev environment
 	docker compose -p $(docker-project-name) -f deploy/compose/common.yml -f deploy/compose/dev.yml --profile dev up -d
 
 demo-start:  ## build docker containers for demo environment

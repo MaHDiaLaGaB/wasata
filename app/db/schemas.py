@@ -1,7 +1,8 @@
 import uuid
+import re
 from enum import Enum
 
-from pydantic import BaseModel, EmailStr, validator, Extra, Field
+from pydantic import BaseModel, validator, Extra, Field
 from typing import Optional
 from datetime import datetime
 
@@ -27,26 +28,20 @@ class WasataBase(BaseModel):
 
 
 class UserCreate(WasataBase):
-    name: str
-    invoice_id: uuid.UUID
-    email: EmailStr
-    phone_number: int
+    phone_number: str
     tokens: float
-    status: StatusEntity = Field()
+    _invoice_id: uuid.UUID
+    _user_status: StatusEntity = Field(default=StatusEntity.INACTIVE)
 
     class Config:
-        exclude = {"status"}
-
-    @validator("name")
-    def validate_name(cls, name: str) -> str:
-        if len(name) < 3:
-            raise ValueError("Name must be at least 3 characters long")
-        return name
+        exclude = ["invoice_id"]
 
     @validator("phone_number")
-    def validate_phone_number(cls, phone_number: int) -> int:
-        if len(str(phone_number)) != 9:
-            raise ValueError("Phone number must be exactly 9 digits long")
+    def validate_phone_number(cls, phone_number: str):
+        pattern = r"^(092|091|094|095)\d{7}$"
+        match = re.match(pattern, phone_number)
+        if not match:
+            raise ValueError("phone number not looks rights")
         return phone_number
 
     @validator("tokens")
@@ -54,6 +49,14 @@ class UserCreate(WasataBase):
         if tokens <= 0:
             raise ValueError("Tokens must be greater than 0")
         return tokens
+
+    @property
+    def user_status(self):
+        return self._user_status
+
+    @user_status.setter
+    def user_status(self, value):
+        self._user_status = value
 
 
 class UserUpdate(WasataBase):
@@ -65,7 +68,7 @@ class UserUpdate(WasataBase):
 class UserGet(UserCreate):
     created_at: datetime
     price: float
-    status: StatusEntity
+    _user_status: StatusEntity
 
 
 class AdminCreate(WasataBase):
