@@ -9,7 +9,7 @@ import secrets
 from http import HTTPStatus
 from app.db.sessions import AdminRepository
 from app.db.schemas import AdminCreate, AdminUpdate
-from app.db.models import Admins
+from app.db.database_engine import UserDB
 
 from app.services.admin_bl import AdminBL
 from app.exceptions import Forbidden
@@ -41,6 +41,7 @@ def update_usdt_price(
     secret_key: str,
     admin_bl: AdminBL = Depends(),
 ) -> float:
-
-    updated_price = admin_bl.update_price_admin(secret_key=secret_key, admin_update=admin_update)
+    updated_price = admin_bl.update_price_admin(
+        secret_key=secret_key, admin_update=admin_update
+    )
     return updated_price.usdt_price
