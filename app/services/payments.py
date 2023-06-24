@@ -28,9 +28,10 @@ class PaymentGetaway:
         async with httpx.AsyncClient() as client:
             logger.info("checking moamalat container")
             req = client.build_request("GET", url=f"http://{self.hostname}:3030/health")
-            health = await client.send(req, stream=True)
-
-            if health.json() == "OK":
+            health = await client.send(req)
+            health.read()
+            logger.info(f"health is {health.json()}")
+            if health.json()["status"] == "OK":
                 logger.info("moamalat is up ... ")
                 return True
             else:
@@ -46,12 +47,12 @@ class PaymentGetaway:
                 json={
                     "amount": usdt_price,
                     "reference": invoice_id,
-                    "date": datetime.now()
+                    "date": datetime.now().isoformat(),
                 },
             )
-            checkout_data = await client.send(checkout_request, stream=True)
+            checkout_data = await client.send(checkout_request)
             if checkout_data:
-                return checkout_data
+                return checkout_data.read()
 
     # approval
     async def approved(self, invoice_id):
@@ -64,12 +65,12 @@ class PaymentGetaway:
                     "reference": invoice_id,
                 },
             )
-            approved_data = await client.send(approved_request, stream=True)
+            approved_data = await client.send(approved_request)
             if approved_data:
-                return approved_data
+                return approved_data.read()
 
 
-pay_getaway = PaymentGetaway(hostname="moamalat")
+pay_getaway = PaymentGetaway(hostname=config.MO3AMALAT_HOST)
 
 
 async def payment_getaway(usdt_price: float, invoice_id: str) -> Tuple[Any, Any, str]:
@@ -83,7 +84,9 @@ async def payment_getaway(usdt_price: float, invoice_id: str) -> Tuple[Any, Any,
             status_code=status.HTTP_400_BAD_REQUEST,
         )
 
-    checkout_resp = await pay_getaway.checkout(usdt_price=usdt_price, invoice_id=invoice_id)
+    checkout_resp = await pay_getaway.checkout(
+        usdt_price=usdt_price, invoice_id=invoice_id
+    )
     approved_resp = await pay_getaway.approved(invoice_id=invoice_id)
 
     # store the token in the cache with an expiration time (5 seconds)
