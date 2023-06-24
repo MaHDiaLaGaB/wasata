@@ -1,0 +1,54 @@
+version: "3"
+services:
+
+# platform-services
+  api:
+    environment:
+      - WASATA_PORT
+      - BINANCE_SECRETE_KEY
+      - BINANCE_API_KEY
+      - BINANCE_BASE_URL
+      - COIN
+      - ADMIN_USERNAME
+      - ADMIN_PASSWORD
+      - SECRET_KEY
+      - SECRETS_ENCRYPTION_KEY
+      - ENVIRONMENT
+      - MOAMALAT_HOST
+      - MOAMALAT_CHECKOUT
+      - MOAMALAT_TRANSACTIONS_APPROVED
+    env_file:
+      - ../envs/demo.env
+
+  moamalat:
+    environment:
+      - MOAMALAT_PORT
+      - TEST_MO_MERCHANT_ID
+      - TEST_MO_TERMINAL_ID
+      - TEST_MO_SECURE_ID
+      - TEST_MO_URL
+    env_file:
+      - ../envs/demo.env
+
+  dev-postgres:
+    environment:
+      - POSTGRES_PORT
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+      - POSTGRES_DB
+      - POSTGRES_HOST
+      - PGVECTOR_ADD_INDEX
+    env_file:
+      - ../envs/demo.env
+  pgadmin:
+    environment:
+      - PGADMIN_DEFAULT_PASSWORD
+      - PGADMIN_DEFAULT_EMAIL
+      - PGADMIN_PORT
+    env_file:
+      - ../envs/demo.env
+  dozzle:
+    environment:
+      - DOZZEL_PORT
+    env_file:
+      - ../envs/demo.env

@@ -1,0 +1,20 @@
+version: "3"
+services:
+
+# platform-services
+  api:
+    env_file:
+      - ../envs/dev.env
+  moamalat:
+    env_file:
+      - ../envs/dev.env
+
+  dev-postgres:
+    env_file:
+      - ../envs/dev.env
+  pgadmin:
+    env_file:
+      - ../envs/dev.env
+  dozzle:
+    env_file:
+      - ../envs/dev.env
