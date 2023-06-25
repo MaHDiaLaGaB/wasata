@@ -14,7 +14,7 @@ services:
       - SECRET_KEY
       - SECRETS_ENCRYPTION_KEY
       - ENVIRONMENT
-      - MOAMALAT_HOST
+      - MOAMALAT_HOST=moamalat
       - MOAMALAT_CHECKOUT
       - MOAMALAT_TRANSACTIONS_APPROVED
     env_file:

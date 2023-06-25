@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 from typing import Dict, Any
 from cryptography.fernet import Fernet
 from app.type import GUID
-from sqlalchemy.orm import registry, relationship
+from sqlalchemy.orm import registry, relationship, RelationshipProperty
 from sqlalchemy import Column, String, DateTime, Numeric, BigInteger, ForeignKey
 import secrets
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -67,7 +67,7 @@ class Admins(UsersBase):  # type: ignore
 
     def __init__(self, **kwargs: Any) -> None:
         super().__init__(**kwargs)
-        self.api_secret_key = self.generate_api_secret_key()
+        self.api_secret_key = self.generate_api_secret_key()  # type: ignore
 
     @property
     def password(self) -> None:
@@ -75,7 +75,7 @@ class Admins(UsersBase):  # type: ignore
 
     @password.setter
     def password(self, password: str) -> None:
-        self._password_hash = generate_password_hash(password)
+        self._password_hash = generate_password_hash(password)  # type: ignore
 
     def generate_api_secret_key(self) -> str:
         key = bytes.fromhex(config.SECRETS_ENCRYPTION_KEY)
@@ -83,4 +83,4 @@ class Admins(UsersBase):  # type: ignore
         return f.encrypt(secrets.token_bytes(16)).decode()
 
     def check_password(self, password: str) -> bool:
-        return check_password_hash(self._password_hash, password)
+        return check_password_hash(self._password_hash, password)  # type: ignore

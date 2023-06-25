@@ -69,6 +69,7 @@ async def create(
         f"the user with phone number {user.phone_number} buy with price {user.price}"
     )
     to_pay_in_LYD = user.tokens * float(usdt_price)
+    logger.info(f"libyan price is >>> {to_pay_in_LYD}")
     user.invoice_id = uuid.uuid4()
     logger.info("release an invoice id using uuid4 ... ")
     # TODO here i will read the payment response

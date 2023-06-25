@@ -1,13 +1,13 @@
 """
 Manages database connections and sessions.
 """
-from typing import Any, Type
+from typing import Any
 
 from .models import Users, UsersBase, Admins
 
 from .schemas import UserCreate, WasataBase, AdminCreate, UserUpdate, AdminUpdate
 from fastapi import Depends
-
+from sqlalchemy.types import Numeric
 from app.exceptions import ObjectNotFound
 import logging
 from .database_engine import UserDB, get_user_db
@@ -136,7 +136,7 @@ class AdminRepository(BaseRepository):
 
     def create(self, admin_create: AdminCreate) -> Admins:
         num_of_admins = self.db.session.query(Admins).count()
-        if num_of_admins > 1:
+        if num_of_admins >= 1:
             raise Exception("maximum number of admins reached")
         admin_db = Admins(**admin_create.dict())
         return self._create(admin_db)

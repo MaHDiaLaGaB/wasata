@@ -37,7 +37,7 @@ class UserCreate(WasataBase):
         exclude = ["invoice_id"]
 
     @validator("phone_number")
-    def validate_phone_number(cls, phone_number: str):
+    def validate_phone_number(cls, phone_number: str) -> str:
         pattern = r"^(092|091|094|095)\d{7}$"
         match = re.match(pattern, phone_number)
         if not match:
@@ -51,11 +51,11 @@ class UserCreate(WasataBase):
         return tokens
 
     @property
-    def user_status(self):
+    def user_status(self) -> str:
         return self._user_status
 
     @user_status.setter
-    def user_status(self, value):
+    def user_status(self, value: StatusEntity) -> None:
         self._user_status = value
 
 

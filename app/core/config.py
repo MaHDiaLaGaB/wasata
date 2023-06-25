@@ -1,6 +1,7 @@
 import os
 from dotenv import load_dotenv
 from .base_configuration import BaseConfig
+from typing import Union
 
 load_dotenv()
 
@@ -9,7 +10,7 @@ class Config(BaseConfig):
     TITLE = os.getenv("TITLE", "FastAPI")
     VERSION = os.getenv("VERSION", "V1")
     ENVIRONMENT = os.getenv("ENVIRONMENT", "dev")
-    WASATA_PORT: int = os.getenv("WASATA_PORT", 8080)
+    WASATA_PORT: Union[str, int] = os.getenv("WASATA_PORT", 8080)
     ADMIN_USERNAME = os.getenv("USERNAME", "admin")
     ADMIN_PASSWORD = os.getenv("PASSWORD", "password")
 

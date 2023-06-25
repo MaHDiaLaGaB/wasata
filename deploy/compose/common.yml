@@ -21,8 +21,6 @@ services:
       - dev-postgres
     networks:
       - wasata-bridge
-    volumes:
-      - ./app/api:/app/api
 
 # -------------------------
 # Postgres database service
