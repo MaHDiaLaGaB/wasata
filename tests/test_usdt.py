@@ -1,5 +1,8 @@
 from app.api.dependencies import BinanceWa
+from app.services.wallet import wallet_validator
 from fastapi import HTTPException
+
+from .cont import CORRECT_WALLET_ADDRESS, WRONG_WALLET_ADDRESS, INCORRECT_WALLET_ADDRESS
 
 from app.services.payments import payment_getaway
 import pytest
@@ -80,3 +83,16 @@ def test_get_ping(spot3_binance_api: BinanceWa) -> None:
 def test_check_system(spot3_binance_api: BinanceWa) -> None:
     res = spot3_binance_api.check_system()
     assert res is True
+
+
+@pytest.mark.asyncio
+async def test_wallet_valedator() -> None:
+    res = await wallet_validator(CORRECT_WALLET_ADDRESS)
+    print(res)
+    assert res is True
+
+    resp = await wallet_validator(WRONG_WALLET_ADDRESS)
+    assert resp is False
+    #
+    response = await wallet_validator(INCORRECT_WALLET_ADDRESS)
+    assert response is False

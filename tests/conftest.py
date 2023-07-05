@@ -4,7 +4,6 @@ from typing import Generator, Any
 from starlette.testclient import TestClient
 from app.server import app
 
-from app.services.payments import PaymentGetaway
 from app.api.dependencies import BinanceWa
 from app.db.database_engine import UserDB
 from app.db.sessions import UserRepository, AdminRepository
@@ -54,7 +53,7 @@ def admin_bl(admin_repository: AdminRepository) -> AdminBL:
 
 
 # this for spot3
-@pytest.fixture
+@pytest.fixture()
 def spot3_binance_api():
     binance_class = BinanceWa()
     yield binance_class

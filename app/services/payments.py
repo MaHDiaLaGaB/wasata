@@ -62,7 +62,9 @@ class PaymentGetaway:
             if config.MOAMALAT_TRANSACTIONS_APPROVED is not None:
                 approved_request = client.build_request(
                     "post",
-                    url=config.MOAMALAT_TRANSACTIONS_APPROVED.format(host=self.hostname),
+                    url=config.MOAMALAT_TRANSACTIONS_APPROVED.format(
+                        host=self.hostname
+                    ),
                     json={
                         "reference": invoice_id,
                     },
