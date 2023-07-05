@@ -112,3 +112,10 @@ class WithdrawError(WasataException):
     exception_code: int = 11
     status_code: int = HTTPStatus.BAD_REQUEST
     description: Optional[str] = "can not withdraw at the moment"
+
+
+@register_exception
+class BSCANClientError(WasataException):
+    exception_code: int = 12
+    status_code: int = HTTPStatus.BAD_REQUEST
+    description: Optional[str] = "Bscan client error"

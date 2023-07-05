@@ -11,7 +11,6 @@ ENV PYTHONUNBUFFERED 1
 RUN apt-get update \
     && apt-get -y install gcc \
     && apt-get clean \
-    && apt-get install -y make \
     && rm -rf /var/lib/apt/lists/* \
     && pip install --upgrade pip
 
@@ -20,22 +19,22 @@ RUN apt-get update \
 RUN python -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
+
+
 # Install project dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the rest of the application code
 COPY app /wasata/app
+COPY .env /wasata/.env
 COPY dev-database /wasata/dev-database
 
 
 # Make the entrypoint script executable
 COPY alembic.ini /wasata/alembic.ini
 
-COPY Makefile /wasata/Makefile
 COPY entrypoint.sh wasata/entrypoint.sh
-
-CMD ["make"]
 
 RUN chmod +x wasata/entrypoint.sh
 

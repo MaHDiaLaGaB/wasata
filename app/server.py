@@ -83,10 +83,10 @@ async def get_redoc_documentation(
 async def openapi(username: str = Depends(get_current_username)) -> Dict[str, Any]:
     if not username:
         raise Forbidden()
-    return get_openapi(title=config.TITLE, version=config.VERSION, routes=app.routes)
+    return get_openapi(title=config.NAME, version=config.VERSION, routes=app.routes)
 
 
-if config.ENVIRONMENT == "dev" and __name__ == "__main__":
+if config.ENV == "dev" and __name__ == "__main__":
     import uvicorn
 
     uvicorn.run(app=app, host="0.0.0.0", port=config.WASATA_PORT)

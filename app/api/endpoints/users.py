@@ -10,6 +10,7 @@ from http import HTTPStatus
 from app.core.config import config
 from app.services.user_bl import UserBL
 from app.services.payments import payment_getaway
+from app.services.wallet import wallet_validator
 from app.api.dependencies import BinanceWa
 from app.exceptions import BadRequest, AdminTokenRunOut, Conflict, ObjectNotFound
 
@@ -36,6 +37,9 @@ async def create(
             detail="no connection can't connect with binance client",
             status_code=status.HTTP_400_BAD_REQUEST,
         )
+
+    if not wallet_validator(wallet_address=wallet_address):
+        raise BadRequest(description="invalid wallet addres please check the steps and provide BNB wallet address")
 
     user.user_status = StatusEntity.ACTIVE
 
@@ -82,7 +86,7 @@ async def create(
         )
 
     # TODO Because of testing, will comment the binance withdraw
-    # binance_end.withdraw(coin=config.COIN, amount=user.tokens, to_address=wallet_address, network=None)
+    binance_end.withdraw(coin=config.COIN, amount=user.tokens, to_address=wallet_address, network=None)
 
     user.price = usdt_price  # type: ignore
     user.user_status = StatusEntity.INACTIVE

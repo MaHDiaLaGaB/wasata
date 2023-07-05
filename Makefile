@@ -46,10 +46,11 @@ dev-start-db:
 	docker run wasata/dev-postgres
 
 test-start:  ## build docker containers for dev environment
-	docker compose -p $(docker-project-name) -f deploy/compose/common.yml -f deploy/compose/dev.yml --profile dev up -d
+	set -a; source deploy/envs/dev.env; set +a; docker compose -p $(docker-project-name) -f deploy/compose/common.yml -f deploy/compose/dev.yml --profile dev up -d
 
 demo-start:  ## build docker containers for demo environment
-	docker compose -p $(docker-project-name) -f deploy/compose/common.yml -f deploy/compose/demo.yml --profile demo up -d
+	set -a; source deploy/envs/demo.env; set +a; docker compose -p $(docker-project-name) -f deploy/compose/common.yml -f deploy/compose/demo.yml --profile demo up -d
+
 
 reset:
 	@make stop
