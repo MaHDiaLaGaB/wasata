@@ -53,7 +53,8 @@ class PaymentGetaway:
                 )
                 checkout_data = await client.send(checkout_request)
                 if checkout_data:
-                    return checkout_data.read().decode()
+                    checkout_data.read()
+                    return checkout_data.json()
 
     # approval
     async def approved(self, invoice_id: str) -> str:
@@ -71,7 +72,8 @@ class PaymentGetaway:
                 )
                 approved_data = await client.send(approved_request)
                 if approved_data:
-                    return approved_data.read().decode()
+                    approved_data.read()
+                    return approved_data.json()
 
 
 pay_getaway = PaymentGetaway(hostname=config.MO3AMALAT_HOST)

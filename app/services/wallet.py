@@ -11,7 +11,7 @@ async def wallet_validator(wallet_address: str) -> bool:
         async with BscScan(config.BSCAN_API_KEY) as client:
             resp = await client.get_bnb_balance(address=wallet_address)
             return isinstance(resp, str) and float(resp) >= 0.0
-    except Exception as e:
-        print(f"Error occurred: {e}")
+    except BSCANClientError as e:
+        logger.error(f"Error occurred: {e}")
         return False
 

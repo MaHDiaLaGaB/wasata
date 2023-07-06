@@ -68,6 +68,7 @@ class UserUpdate(WasataBase):
 class UserGet(UserCreate):
     created_at: datetime
     price: float
+    total_price: float
     _user_status: StatusEntity
 
 

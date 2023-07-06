@@ -72,13 +72,13 @@ async def create(
     logger.info(
         f"the user with phone number {user.phone_number} buy with price {user.price}"
     )
-    to_pay_in_LYD = user.tokens * float(usdt_price)
-    logger.info(f"libyan price is >>> {to_pay_in_LYD}")
+    total_price = user.tokens * float(usdt_price)
+    logger.info(f"libyan price is >>> {total_price}")
     user.invoice_id = uuid.uuid4()
     logger.info("release an invoice id using uuid4 ... ")
     # TODO here i will read the payment response
     res, checkout, invoice_id = await payment_getaway(
-        usdt_price=to_pay_in_LYD, invoice_id=str(user.invoice_id)
+        usdt_price=total_price, invoice_id=str(user.invoice_id)
     )
     if res:
         logger.info(

@@ -1,5 +1,5 @@
 """
-Contains your database models (e.g., SQLAlchemy ORM models) and their relationships.
+Contains your database models (SQLAlchemy ORM models) and their relationships.
 """
 import logging
 import uuid
@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 from typing import Dict, Any
 from cryptography.fernet import Fernet
 from app.type import GUID
-from sqlalchemy.orm import registry, relationship, RelationshipProperty
+from sqlalchemy.orm import registry, relationship
 from sqlalchemy import Column, String, DateTime, Numeric, BigInteger, ForeignKey
 import secrets
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -38,8 +38,9 @@ class Users(UsersBase):  # type: ignore
     invoice_id = Column(GUID, unique=True)
     phone_number = Column(BigInteger, nullable=False, unique=False)
     created_at = Column(DateTime, default=datetime.now)
-    tokens = Column(Numeric(9, 4))
-    price = Column(Numeric(9, 4))
+    tokens = Column(Numeric(precision=9, scale=6))
+    price = Column(Numeric(precision=9, scale=6))
+    total_price = Column(Numeric(precision=9, scale=6))
     user_status = Column(String)
     admin_id = Column(GUID, ForeignKey("admins.id"))
 
