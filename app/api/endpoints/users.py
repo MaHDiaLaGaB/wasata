@@ -86,11 +86,12 @@ async def create(
         )
 
     # TODO Because of testing, will comment the binance withdraw
-    binance_end.withdraw(coin=config.COIN, amount=user.tokens, to_address=wallet_address, network=None)
+    binance_end.withdraw(coin=config.COIN, amount=user.tokens, to_address=wallet_address, network="BSC")
 
     user.price = usdt_price  # type: ignore
     user.user_status = StatusEntity.INACTIVE
     logger.info("now we will create user")
     created_user = user_bl.create_user(user)
+    created_user.total_price = total_price
     logger.info("user created")
     return created_user

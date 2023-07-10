@@ -30,7 +30,7 @@ class PaymentGetaway:
             req = client.build_request("GET", url=f"http://{self.hostname}:3030/health")
             health = await client.send(req)
             health.read()
-            logger.info(f"health is {health.json()}")
+            # logger.info(f"health is {health.json()}")
             if health.json()["status"] == "OK":
                 logger.info("moamalat is up ... ")
                 return True

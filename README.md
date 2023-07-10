@@ -1,0 +1,2 @@
+# Wasata USDT
+Coming soon
