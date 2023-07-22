@@ -1,0 +1,101 @@
+.hero-area {
+    padding: 270px 0 160px; 
+    overflow: hidden; 
+    @media (max-width: 991.98px){
+        padding: 160px 0 90px;
+    }
+    @media (max-width: 575.98px){
+        padding: 130px 0 60px;
+    }
+    .hero-text{
+        @media (max-width: 991.98px){
+            text-align: center;
+        }
+    }
+    h1 {
+        font-size: 72px;
+        font-weight: 600;
+        line-height: 84.024px;
+        @media (max-width: 767.98px){
+            font-size: 50px;
+            line-height: 1.3;
+        }
+        @media (max-width: 575.98px){
+            font-size: 35px;
+        }
+        span{
+            color: rgba(176, 241, 38, 1)
+        }
+    }
+    p{
+        color: #C0C0C0; 
+        font-size: 18px; 
+        font-weight: 400;
+        line-height: 30.006px;
+        max-width: 500px;
+        margin: 20px 0 40px;
+        @media (max-width: 991.98px){
+            margin: 20px auto 30px;
+        }
+    }
+    .btn-lg{ 
+    }
+
+    .hero-img{
+        position: relative;
+        max-width: 479.648px;
+        margin-left: auto;
+        @media (max-width: 991.98px){
+            margin: 160px auto 0;   
+        }
+        img{ 
+            
+        }
+        .hero1{
+            @media (max-width: 767.98px){
+           
+                width: 80%; 
+            }
+        }
+        .hero2,
+        .hero3,
+        .hero4{
+            position: absolute;
+            top: 0;
+        }
+
+        .hero2{
+            left: 16px;
+            top: -68px;
+        }
+
+        .hero3{
+            right: 126px;
+            top: -95px;
+            @media (max-width: 767.98px){
+                height: 80px;
+                top: -70px;
+                right: 100px;
+            }
+        }
+
+        .hero4{
+            right: 0;
+            top: -150px;
+            @media (max-width: 767.98px){
+                height: 100px;
+                top: -100px;
+            }
+        }
+
+    }
+}
+
+.fade {
+    opacity: 1;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.fade-out {
+    opacity: 0;
+}

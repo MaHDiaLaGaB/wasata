@@ -35,12 +35,6 @@ class Config(BaseConfig):
     COIN = "USDT"
     BSCAN_API_KEY = os.environ.get("BSCAN_API_KEY")
 
-    # mo3amalat
-    MO3AMALAT_HOST = os.environ.get("MOAMALAT_HOST", "localhost")
-    MO3AMALAT_CHECKOUT = os.environ.get("MOAMALAT_CHECKOUT")
-    MOAMALAT_TRANSACTIONS_APPROVED = os.environ.get("MOAMALAT_TRANSACTIONS_APPROVED")
-
-
 config = cast(Config, generate_config(Config))  # pylint: disable=C0103
 config.WASATA_PORT = int(config.WASATA_PORT)
 config.ENV = config.ENV
@@ -57,8 +51,5 @@ config.BINANCE_SECRETE_KEY = config.BINANCE_SECRETE_KEY
 config.BINANCE_BASE_URL = config.BINANCE_BASE_URL
 config.BINANCE_API_KEY = config.BINANCE_API_KEY
 config.BSCAN_API_KEY = config.BSCAN_API_KEY
-config.MO3AMALAT_HOST = config.MO3AMALAT_HOST
-config.MO3AMALAT_CHECKOUT = config.MO3AMALAT_CHECKOUT
-config.MOAMALAT_TRANSACTIONS_APPROVED = config.MOAMALAT_TRANSACTIONS_APPROVED
 
 config = Config()

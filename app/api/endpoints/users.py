@@ -9,7 +9,6 @@ from http import HTTPStatus
 
 from app.core.config import config
 from app.services.user_bl import UserBL
-from app.services.payments import payment_getaway
 from app.services.wallet import wallet_validator
 from app.api.dependencies import BinanceWa
 from app.exceptions import BadRequest, AdminTokenRunOut, Conflict, ObjectNotFound
@@ -19,7 +18,7 @@ logger = logging.getLogger(__name__)
 route = APIRouter(tags=["users"])
 
 
-@route.post(BUY, status_code=HTTPStatus.CREATED)
+@route.post("/buy", status_code=HTTPStatus.CREATED)
 async def create(
     *,
     user: UserCreate = Body(),
@@ -77,16 +76,18 @@ async def create(
     user.invoice_id = uuid.uuid4()
     logger.info("release an invoice id using uuid4 ... ")
     # TODO here i will read the payment response
-    res, checkout, invoice_id = await payment_getaway(
-        usdt_price=total_price, invoice_id=str(user.invoice_id)
-    )
-    if res:
-        logger.info(
-            f"sending info to binance to start sending to {wallet_address} under invoice >> {invoice_id} ... "
-        )
+    # here should have a function to start the user payment in the frontend/
+    # and if the payment done seccassfally i will continue exicuting this function and sell my product
+    # res, checkout, invoice_id = await payment_getaway(
+    #     usdt_price=total_price, invoice_id=str(user.invoice_id)
+    # )
+    # if res:
+    #     logger.info(
+    #         f"sending info to binance to start sending to {wallet_address} under invoice >> {invoice_id} ... "
+    #     )
 
     # TODO Because of testing, will comment the binance withdraw
-    binance_end.withdraw(coin=config.COIN, amount=user.tokens, to_address=wallet_address, network="BSC")
+    # binance_end.withdraw(coin=config.COIN, amount=user.tokens, to_address=wallet_address, network="BSC")
 
     user.price = usdt_price  # type: ignore
     user.user_status = StatusEntity.INACTIVE

@@ -29,7 +29,7 @@ services:
     image: wasata/dev-postgres
     restart: unless-stopped
     container_name: wasata_db
-    profiles: ["production", "demo", "dev"]
+    profiles: ["demo", "dev"]
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}" ]
       interval: 30s
@@ -41,15 +41,15 @@ services:
       - wasata-bridge
 
 # -------------------------
-# Mo3amalat payment service
+# Frontend service
 # -------------------------
-  moamalat:
-    container_name: wasata_mo3amalat
-    image: wasata/moamalat
+  frontend:
+    container_name: wasata_frontend
+    image: wasata/frontend
     profiles: ["production", "dev", "demo"]
     restart: unless-stopped
     ports:
-      - ${MOAMALAT_PORT}:${MOAMALAT_PORT}
+      - ${FRONTEND_PORT}:${FRONTEND_PORT}
     command: npm start
     depends_on:
       - api
