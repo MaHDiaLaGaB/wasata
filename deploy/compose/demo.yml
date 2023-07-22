@@ -14,9 +14,6 @@ services:
       - SECRET_KEY
       - SECRETS_ENCRYPTION_KEY
       - ENVIRONMENT
-      - MOAMALAT_HOST=moamalat
-      - MOAMALAT_CHECKOUT
-      - MOAMALAT_TRANSACTIONS_APPROVED
       - POSTGRES_PORT
       - POSTGRES_USER
       - POSTGRES_PASSWORD
@@ -26,13 +23,9 @@ services:
     env_file:
       - ../envs/demo.env
 
-  moamalat:
+  frontend:
     environment:
-      - MOAMALAT_PORT
-      - TEST_MO_MERCHANT_ID
-      - TEST_MO_TERMINAL_ID
-      - TEST_MO_SECURE_ID
-      - TEST_MO_URL
+      - FRONTEND_PORT
     env_file:
       - ../envs/demo.env
 

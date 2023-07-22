@@ -4,7 +4,6 @@ import logging
 from fastapi.testclient import TestClient
 from app.core.config import config
 from app.db.sessions import AdminRepository, UserRepository
-from app.services.payments import PaymentGetaway
 
 USER_1 = {
     "tokens": 9,

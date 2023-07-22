@@ -27,16 +27,16 @@ build-images:  ##  Build all images
 	echo "Building images"
 	make build-db
 	make build-api
-	make build-payment
+	make build-frontend
 
 
 build-api:  ## build docker images
 	echo "Building images"
 	docker build -t wasata/api .
 
-build-payment:  ## build moamalat payment image
-	echo "Building mo3amalat"
-	docker build -t wasata/moamalat ./mo3amalat
+build-frontend:  ## build moamalat payment image
+	echo "Building frontend"
+	docker build -t wasata/frontend ./frontend
 
 build-db:  ## build database image
 	echo "Building database"

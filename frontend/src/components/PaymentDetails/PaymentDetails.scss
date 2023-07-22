@@ -1,0 +1,72 @@
+.payment-area {
+    padding: 180px 0 120px;
+    @media (max-width: 767.98px) {
+        padding: 120px 0 60px;
+    }
+
+    .from-input {
+        max-width: 670px;
+        padding: 20px 20px 30px;
+        margin: 0 auto;
+        @media (max-width: 767.98px) {
+            padding: 20px 10px 30px;
+        }
+
+        .form-label {
+            font-size: 12px;
+            padding-left: 15px;
+        }
+
+        .h5 {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .textarea {
+            height: 150px;
+            resize: vertical;
+        }
+    }
+}
+
+.from-input {
+    textarea{
+        border: 0;
+        outline: none;
+        border-radius: 10px;
+        background: #232323;
+        padding: 13.5px 12px 14.5px 12px;
+        color: #fff;
+        font-size: 14px;
+        width: 100%;
+        &::placeholder{
+            color: #999;
+        }
+    }
+    ul {
+        margin-top: 20px;
+
+        li {
+            display: flex;
+            font-size: 14px;
+            font-weight: 700;
+            border-bottom: 1px solid #999;
+            padding-bottom: 15px;
+            margin-bottom: 27px;
+
+            &:last-child {
+                border: 0;
+                margin-bottom: 0;
+                padding-bottom: 0;
+            }
+
+            span {
+                &:last-child {
+                    margin-left: auto;
+                    color: #999;
+                }
+            }
+        }
+    }
+}
