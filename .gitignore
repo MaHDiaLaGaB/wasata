@@ -12,6 +12,7 @@ frontend/node_modules
 .idea/**/usage.statistics.xml
 .idea/**/dictionaries
 .idea/**/shelf
+app/wasata_venv
 
 database.db
 
@@ -218,7 +219,7 @@ celerybeat.pid
 *.sage.py
 
 # Environments
-.env
+app/.env
 .venv
 env/
 venv/

@@ -1,7 +1,7 @@
 .env:  ## Ensures that env file exists
 	@cp -n .env.example .env
 
-include .env
+include ./app/.env
 export
 
 docker-project-name := wasata-api
@@ -32,7 +32,7 @@ build-images:  ##  Build all images
 
 build-api:  ## build docker images
 	echo "Building images"
-	docker build -t wasata/api .
+	docker build -t wasata/api ./app
 
 build-frontend:  ## build moamalat payment image
 	echo "Building frontend"

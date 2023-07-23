@@ -2,3 +2,6 @@ Dockerfile
 tests
 __pycache__
 */__pycache__
+app/Dockerfile
+app/logs
+app/wasata_venv

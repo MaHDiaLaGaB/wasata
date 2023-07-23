@@ -1,5 +1,5 @@
 # Use the official Python base image
-FROM python:3.10-slim
+FROM python:3.11-slim
 
 WORKDIR /wasata
 
@@ -26,16 +26,15 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the rest of the application code
-COPY app /wasata/app
+COPY . /wasata/app
 COPY .env /wasata/.env
-COPY dev-database /wasata/dev-database
 
 
 # Make the entrypoint script executable
 COPY alembic.ini /wasata/alembic.ini
 
-COPY entrypoint.sh wasata/entrypoint.sh
+COPY entrypoint.sh entrypoint.sh
 
-RUN chmod +x wasata/entrypoint.sh
+RUN chmod +x /wasata/entrypoint.sh
 
-ENTRYPOINT ["./wasata/entrypoint.sh"]
+ENTRYPOINT ["./entrypoint.sh"]
