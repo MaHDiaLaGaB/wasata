@@ -20,6 +20,8 @@ services:
       - POSTGRES_DB
       - POSTGRES_HOST
       - PGVECTOR_ADD_INDEX
+      - MJ_APIKEY_PUBLIC
+      - MJ_APIKEY_PRIVATE
     env_file:
       - ../envs/demo.env
 

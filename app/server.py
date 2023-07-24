@@ -9,7 +9,7 @@ from fastapi.openapi.utils import get_openapi
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.responses import HTMLResponse
 
-from app.api.endpoints import health, users, admin, routes
+from app.api.endpoints import health, users, admin, routes, submit_form
 from app.core.logg import setup_logging
 from app.core.config import config
 from app.db.database_engine import UserDB, get_user_db
@@ -19,7 +19,7 @@ from app.exceptions import Unauthorized, Forbidden
 
 
 async def start_user_db_session(
-        db: UserDB = Depends(get_user_db),
+    db: UserDB = Depends(get_user_db),
 ) -> AsyncGenerator[None, None]:
     with db.create_session():
         yield
@@ -68,7 +68,7 @@ app.add_middleware(
 
 @app.exception_handler(WasataException)
 def exception_handler_middleware(
-        _request: Request, exception: WasataException
+    _request: Request, exception: WasataException
 ) -> JSONResponse:
     return handle_exception(config, exception)
 
@@ -76,11 +76,12 @@ def exception_handler_middleware(
 app.include_router(health.route)
 app.include_router(users.route)
 app.include_router(admin.route)
+app.include_router(submit_form.route)
 
 
 @app.get(routes.DOCS, include_in_schema=False)
 async def get_swagger_documentation(
-        username: str = Depends(get_current_username),
+    username: str = Depends(get_current_username),
 ) -> HTMLResponse:
     if not username:
         raise Forbidden()
@@ -89,7 +90,7 @@ async def get_swagger_documentation(
 
 @app.get(routes.REDOC, include_in_schema=False)
 async def get_redoc_documentation(
-        username: str = Depends(get_current_username),
+    username: str = Depends(get_current_username),
 ) -> HTMLResponse:
     if not username:
         raise Forbidden()

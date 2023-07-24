@@ -1,11 +1,12 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import './AddressForm.scss'
 import axios from 'axios';
 
 const AddressForm = () => {
-  const { register, handleSubmit, formState: { errors } } = useForm();
+  const { register, handleSubmit, formState: { errors }, reset } = useForm();
   const [submitting, setSubmitting] = useState(false);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
   const onSubmit = async (data) => {
     setSubmitting(true);
@@ -24,7 +25,9 @@ const AddressForm = () => {
     try {
       const response = await axios.post(`${url}?${params}`, requestData);
       console.log(response.data);
+      setShowSuccessMessage(true);
       setSubmitting(false);
+      resetForm();
     } catch (error) {
       console.error('Error:', error);
       setSubmitting(false);
@@ -33,12 +36,22 @@ const AddressForm = () => {
     }
   };
 
+  const resetForm = () => {
+    setShowSuccessMessage(false);
+    reset();
+  };
+
   return (
     <div className="address-area">
       <div className="container">
         <div className="row">
           <div className="col-lg-12">
             <form onSubmit={handleSubmit(onSubmit)} className='from-input'>
+              {showSuccessMessage && (
+                <div className="alert alert-success" role="alert">
+                  Your message has been sent successfully!
+                </div>
+              )}
               <div className="mb-3">
                 <label htmlFor="phone" className="form-label">Phone number</label>
                 <input

@@ -38,7 +38,9 @@ async def create(
         )
 
     if not wallet_validator(wallet_address=wallet_address):
-        raise BadRequest(description="invalid wallet addres please check the steps and provide BNB wallet address")
+        raise BadRequest(
+            description="invalid wallet addres please check the steps and provide BNB wallet address"
+        )
 
     user.user_status = StatusEntity.ACTIVE
 
