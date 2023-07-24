@@ -14,4 +14,3 @@ async def wallet_validator(wallet_address: str) -> bool:
     except BSCANClientError as e:
         logger.error(f"Error occurred: {e}")
         return False
-

@@ -25,6 +25,10 @@ class Config(BaseConfig):
     DATABASE_URI = f"postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}"
     DB_CONNECTION_TIMEOUT = 5
 
+    # mailjet
+    MJ_APIKEY_PUBLIC = os.environ.get("MJ_APIKEY_PUBLIC")
+    MJ_APIKEY_PRIVATE = os.environ.get("MJ_APIKEY_PRIVATE")
+
     # secret to change anything here
     SECRETS_ENCRYPTION_KEY = os.environ.get("SECRETS_ENCRYPTION_KEY")
 
@@ -34,6 +38,7 @@ class Config(BaseConfig):
     BINANCE_BASE_URL = "https://api.binance.com"
     COIN = "USDT"
     BSCAN_API_KEY = os.environ.get("BSCAN_API_KEY")
+
 
 config = cast(Config, generate_config(Config))  # pylint: disable=C0103
 config.WASATA_PORT = int(config.WASATA_PORT)
@@ -51,5 +56,7 @@ config.BINANCE_SECRETE_KEY = config.BINANCE_SECRETE_KEY
 config.BINANCE_BASE_URL = config.BINANCE_BASE_URL
 config.BINANCE_API_KEY = config.BINANCE_API_KEY
 config.BSCAN_API_KEY = config.BSCAN_API_KEY
+config.MJ_APIKEY_PUBLIC = config.MJ_APIKEY_PUBLIC
+config.MJ_APIKEY_PRIVATE = config.MJ_APIKEY_PRIVATE
 
 config = Config()
