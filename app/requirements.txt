@@ -14,7 +14,7 @@ Werkzeug
 mailjet_rest
 cryptography
 itsdangerous
-binance-connector~=3.1.0
+binance-connector~=3.4.0
 aiocache~=0.12.1
 aioredis~=2.0.1
 redis
