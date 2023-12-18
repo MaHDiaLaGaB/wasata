@@ -13,7 +13,7 @@ frontend/node_modules
 .idea/**/dictionaries
 .idea/**/shelf
 app/wasata_venv
-wasata-frontend
+
 database.db
 
 deploy/envs
