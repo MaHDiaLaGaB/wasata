@@ -4,7 +4,7 @@ from typing import Generator, Any
 from starlette.testclient import TestClient
 from app.server import app
 
-from app.api.dependencies import BinanceWa
+from app.api.binance_client import BinanceWa
 from app.db.database_engine import UserDB
 from app.db.sessions import UserRepository, AdminRepository
 from app.services.user_bl import UserBL

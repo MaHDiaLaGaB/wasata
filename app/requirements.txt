@@ -1,6 +1,6 @@
 fastapi==0.97.0
 uvicorn
-# SQLAlchemy
+SQLAlchemy
 alembic
 sqlmodel
 pydantic
@@ -15,13 +15,13 @@ mailjet_rest
 cryptography
 itsdangerous
 binance-connector~=3.1.0
-aiocache~=0.12.1
+aiocache~=0.12.2
 aioredis~=2.0.1
 redis
 python-jose
 jwt~=1.3.1
 httpx~=0.25.0
-click~=8.1.5
+click~=8.1.7
 bscscan-python~=2.0.0
 fastapi-mail
 
