@@ -6,11 +6,11 @@ from .routes import BUY
 from app.db.schemas import UserCreate, UserGet, StatusEntity
 from app.db.sessions import AdminRepository
 from http import HTTPStatus
-
 from app.core.config import config
 from app.services.user_bl import UserBL
 from app.services.wallet import wallet_validator
-from app.api.dependencies import BinanceWa
+from app.api.binance_client import BinanceWa
+from app.api.tlync_client import TlyncClient
 from app.exceptions import BadRequest, AdminTokenRunOut, Conflict, ObjectNotFound
 
 logger = logging.getLogger(__name__)
@@ -18,15 +18,23 @@ logger = logging.getLogger(__name__)
 route = APIRouter(tags=["users"])
 
 
+# Dependency provider function
+def get_payment_api():
+    tlync_end = TlyncClient(is_test_environment=True)
+    tlync_end.set_token("your-access-token-here")
+    return tlync_end
+
+
 @route.post("/buy", status_code=HTTPStatus.CREATED)
 async def create(
-    *,
-    user: UserCreate = Body(),
-    user_bl: UserBL = Depends(),
-    binance_end: BinanceWa = Depends(),
-    admin_repository: AdminRepository = Depends(),
-    admin_username: str = Query(),
-    wallet_address: str = Query(),
+        *,
+        user: UserCreate = Body(),
+        user_bl: UserBL = Depends(),
+        binance_end: BinanceWa = Depends(),
+        tlync_end: TlyncClient = Depends(get_payment_api),
+        admin_repository: AdminRepository = Depends(),
+        admin_username: str = Query(),
+        wallet_address: str = Query(),
 ) -> UserGet:
     if user.user_status == StatusEntity.ACTIVE:
         raise Conflict(description="it's duple request")
@@ -79,15 +87,8 @@ async def create(
     logger.info("release an invoice id using uuid4 ... ")
     # TODO here i will read the payment response
     # here should have a function to start the user payment in the frontend/
-    # and if the payment done seccassfally i will continue exicuting this function and sell my product
-    # res, checkout, invoice_id = await payment_getaway(
-    #     usdt_price=total_price, invoice_id=str(user.invoice_id)
-    # )
-    # if res:
-    #     logger.info(
-    #         f"sending info to binance to start sending to {wallet_address} under invoice >> {invoice_id} ... "
-    #     )
-
+    # and if the payment done successfully i will continue executing this function and sell my product
+    tlync_response = tlync_end.initiate_payment()
     # TODO Because of testing, will comment the binance withdraw
     # binance_end.withdraw(coin=config.COIN, amount=user.tokens, to_address=wallet_address, network="BSC")
 

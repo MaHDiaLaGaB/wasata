@@ -1,4 +1,4 @@
-from app.api.dependencies import BinanceWa
+from app.api.binance_client import BinanceWa
 from app.services.wallet import wallet_validator
 from fastapi import HTTPException
 
