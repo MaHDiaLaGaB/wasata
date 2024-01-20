@@ -15,7 +15,7 @@ mailjet_rest
 cryptography
 itsdangerous
 binance-connector~=3.1.0
-aiocache~=0.12.1
+aiocache~=0.12.2
 aioredis~=2.0.1
 redis
 python-jose
