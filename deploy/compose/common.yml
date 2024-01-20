@@ -9,6 +9,9 @@ services:
     image: wasata/api
     restart: unless-stopped
     container_name: wasata_api
+    build:
+      context: ../
+      dockerfile: app/Dockerfile
     profiles: ["production", "dev", "demo"]
     ports:
       - ${WASATA_PORT}:${WASATA_PORT}
@@ -29,6 +32,9 @@ services:
     image: wasata/dev-postgres
     restart: unless-stopped
     container_name: wasata_db
+    build:
+      context: ../
+      dockerfile: dev-database/Dockerfile
     profiles: ["demo", "dev"]
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}" ]
@@ -37,6 +43,8 @@ services:
       retries: 5
     ports:
       - ${POSTGRES_PORT}:${POSTGRES_PORT}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
     networks:
       - wasata-bridge
 
@@ -46,6 +54,9 @@ services:
   frontend:
     container_name: wasata_frontend
     image: wasata/frontend
+    build:
+      context: ../
+      dockerfile: frontend/Dockerfile
     profiles: ["production", "dev", "demo"]
     restart: unless-stopped
     ports:
@@ -95,3 +106,7 @@ services:
 networks:
   wasata-bridge:
     driver: bridge
+
+volumes:
+  postgres_data:
+

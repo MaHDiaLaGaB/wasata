@@ -39,6 +39,11 @@ class Config(BaseConfig):
     COIN = "USDT"
     BSCAN_API_KEY = os.environ.get("BSCAN_API_KEY")
 
+    #Tlync
+    TLYNC_TEST_BASE_URL = os.environ.get("TLYNC_TEST_BASE_URL")
+    TLYNC_BASE_URL = os.environ.get("TLYNC_BASE_URL")
+    TLYNC_TOKEN = os.environ.get("TLYNC_TOKEN")
+
 
 config = cast(Config, generate_config(Config))  # pylint: disable=C0103
 config.WASATA_PORT = int(config.WASATA_PORT)
