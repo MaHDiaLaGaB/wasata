@@ -1,6 +1,6 @@
 fastapi==0.97.0
 uvicorn
-# SQLAlchemy
+SQLAlchemy
 alembic
 sqlmodel
 pydantic

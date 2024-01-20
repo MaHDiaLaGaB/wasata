@@ -5,7 +5,7 @@ services:
   api:
     env_file:
       - ../envs/dev.env
-  moamalat:
+  frontend:
     env_file:
       - ../envs/dev.env
 
