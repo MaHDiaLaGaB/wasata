@@ -20,7 +20,7 @@ aioredis~=2.0.1
 redis
 python-jose
 jwt~=1.3.1
-httpx~=0.25.0
+httpx~=0.26.0
 click~=8.1.7
 bscscan-python~=2.0.0
 fastapi-mail
