@@ -1,3 +1,4 @@
+import logging
 from fastapi import Depends
 from app.db.models import Admins
 from app.db.sessions import AdminRepository
@@ -10,16 +11,20 @@ class AdminBL:
         self.admin_repository = admin_repository
 
     def create_admin(self, admin_create: AdminCreate = Depends()) -> Admins:
-        # Check if the admin already exists
-        existing_admin = self.admin_repository.get(admin_create.username)
-        if existing_admin:
-            raise ValueError("Admin already exists")
+        try:
+            # Check if the admin already exists
+            existing_admin = self.admin_repository.get(admin_create.username)
+            if existing_admin:
+                raise ValueError("Admin already exists")
 
-        # Create the admin
+            # Create the admin
 
-        admin = self.admin_repository.create(admin_create)
+            admin = self.admin_repository.create(admin_create)
 
-        return admin
+            return admin
+        except Exception as e:
+            logging.error(f"Error processing request: {e}")
+            # Handle error appropriately
 
     def update_price_admin(self, secret_key: str, admin_update: AdminUpdate):
         admin = self.admin_repository.get_by_secret(secret_key)

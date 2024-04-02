@@ -10,7 +10,7 @@ const AddressForm = () => {
 
   const onSubmit = async (data) => {
     setSubmitting(true);
-    const url = 'http://localhost:8080/buy'; // replace YOUR_PORT with the actual port number
+    const url = process.env.BACKEND_URL + '/api/v1/buy'; // replace YOUR_PORT with the actual port number
 
     const requestData = {
       phone_number: data.phone.toString(),

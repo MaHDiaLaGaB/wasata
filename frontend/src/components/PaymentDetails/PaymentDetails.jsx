@@ -35,7 +35,7 @@ const ContactForm = () => {
       return;
     }
     try {
-      const response = await axios.post('http://localhost:8080/contact', {
+      const response = await axios.post(process.env.BACKEND_URL + '/api/v1/contact', {
         name,
         email,
         phone_number: phoneNumber,

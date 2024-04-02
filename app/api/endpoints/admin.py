@@ -31,6 +31,7 @@ def admin_endpoint(
         raise Forbidden(description="Tik Tok.. Try Again")
 
     logger.info("Craeting admin ... ")
+    logging.debug(f"Received request JSON: {admin_create}")
     return admin_bl.create_admin(admin_create=admin_create)
 
 

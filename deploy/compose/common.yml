@@ -10,11 +10,11 @@ services:
     restart: unless-stopped
     container_name: wasata_api
     build:
-      context: ../
-      dockerfile: app/Dockerfile
+      context: ../../app
+      dockerfile: Dockerfile
     profiles: ["production", "dev", "demo"]
     ports:
-      - ${WASATA_PORT}:${WASATA_PORT}
+      - 8080:8080
     command: "./entrypoint.sh"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://api:8080/health"]
@@ -33,8 +33,8 @@ services:
     restart: unless-stopped
     container_name: wasata_db
     build:
-      context: ../
-      dockerfile: dev-database/Dockerfile
+      context: ../../dev-database
+      dockerfile: Dockerfile
     profiles: ["demo", "dev"]
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}" ]
@@ -42,7 +42,7 @@ services:
       timeout: 60s
       retries: 5
     ports:
-      - ${POSTGRES_PORT}:${POSTGRES_PORT}
+      - 5432:5432
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
@@ -55,12 +55,12 @@ services:
     container_name: wasata_frontend
     image: wasata/frontend
     build:
-      context: ../
-      dockerfile: frontend/Dockerfile
+      context: ../../frontend
+      dockerfile: Dockerfile
     profiles: ["production", "dev", "demo"]
     restart: unless-stopped
     ports:
-      - ${FRONTEND_PORT}:${FRONTEND_PORT}
+      - 3030:3030
     command: npm start
     depends_on:
       - api
@@ -74,13 +74,13 @@ services:
     container_name: wasata_pgadmin
     image: dpage/pgadmin4
     platform: linux/amd64
-    profiles: ["production", "demo"]
+    profiles: ["production", "demo", "dev"]
     environment:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgadmin4@pgadmin.org}
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
       PGADMIN_CONFIG_SERVER_MODE: 'False'
     ports:
-      - ${PGADMIN_PORT}:${PGADMIN_PORT}
+      - 5050:5050
     restart: unless-stopped
     depends_on:
       - dev-postgres
@@ -94,7 +94,7 @@ services:
     container_name: wasata_dozzle
     image: amir20/dozzle:latest
     platform: linux/amd64
-    profiles: ["production", "demo"]
+    profiles: ["production", "demo", "dev"]
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     ports:

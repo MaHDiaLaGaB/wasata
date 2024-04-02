@@ -1,4 +1,5 @@
 import secrets
+import logging
 from typing import AsyncGenerator, Dict, Any
 
 from fastapi import FastAPI, Depends, Request
@@ -34,8 +35,6 @@ app = FastAPI(
     dependencies=[Depends(start_user_db_session)],
 )
 security = HTTPBasic()
-
-setup_logging()
 
 
 def get_current_username(credentials: HTTPBasicCredentials = Depends(security)) -> str:
@@ -104,7 +103,18 @@ async def openapi(username: str = Depends(get_current_username)) -> Dict[str, An
     return get_openapi(title=config.NAME, version=config.VERSION, routes=app.routes)
 
 
+# @app.post("/api/v1/admin")
+# async def your_endpoint(request: Request):
+#     try:
+#         request_json = await request.json()  # This gets the parsed JSON body
+#         logging.debug(f"Received request JSON: {request_json}")
+#         # Your endpoint logic here
+#     except Exception as e:
+#         logging.error(f"Error processing request: {e}")
+
+
 if config.ENV == "dev" and __name__ == "__main__":
     import uvicorn
 
+    setup_logging()
     uvicorn.run(app=app, host="0.0.0.0", port=config.WASATA_PORT)

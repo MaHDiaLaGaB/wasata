@@ -31,7 +31,7 @@ class UserCreate(WasataBase):
     phone_number: str
     tokens: float
     _invoice_id: uuid.UUID
-    _user_status: StatusEntity = Field(default=StatusEntity.INACTIVE)
+    user_status: StatusEntity = Field(default=StatusEntity.INACTIVE)
 
     class Config:
         exclude = ["invoice_id"]
@@ -51,12 +51,17 @@ class UserCreate(WasataBase):
         return tokens
 
     @property
-    def user_status(self) -> str:
-        return self._user_status
+    def user_state(self) -> str:
+        # Assuming StatusEntity has string values associated with its members
+        return self.user_status.value
 
-    @user_status.setter
-    def user_status(self, value: StatusEntity) -> None:
-        self._user_status = value
+    @user_state.setter
+    def user_state(self, value: str) -> None:
+        # Convert the incoming string to a StatusEntity enum, ensuring it's a valid enum member
+        try:
+            self.user_status = StatusEntity(value)
+        except ValueError:
+            raise ValueError(f"{value} is not a valid status")
 
 
 class UserUpdate(WasataBase):
@@ -72,15 +77,14 @@ class UserGet(UserCreate):
     _user_status: StatusEntity
 
 
-class AdminCreate(WasataBase):
+class AdminCreate(BaseModel):
     username: str
     password: str = Field(..., write_only=True)
     usdt_price: float
 
 
-class AdminUpdate(WasataBase):
+class AdminUpdate(BaseModel):
     usdt_price: float | None
-
 
 # class AdminInDB(AdminCreate):
 #     id: int

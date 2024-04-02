@@ -100,7 +100,7 @@ change-usdt-price:
 # ------------------------ Digital Ocean Deployments ---------------------------
 #
 do-dev-start:  ## start dev deployment on digital ocean
-	docker compose -p $(docker-project-name) -f deploy/compose/common.yml -f deploy/compose/dev.yml --profile dev up -d
+	docker compose -p $(docker-project-name) -f deploy/compose/common.yml -f deploy/compose/dev.yml --profile dev up --build -d
 
 do-demo-start:  ## start dev deployment on digital ocean
 	docker compose -p $(docker-project-name) -f deploy/compose/common.yml -f deploy/compose/demo.yml --profile demo up -d
