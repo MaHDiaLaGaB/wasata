@@ -1,5 +1,5 @@
-from app.core.config import config
-from app.exceptions import BSCANClientError
+from core.config import config
+from cus_exceptions import BSCANClientError
 from bscscan import BscScan
 import logging
 

@@ -1,7 +1,7 @@
 import uuid
 from typing import Any, Type
 
-from app.exceptions import WasataNotImplemented
+from cus_exceptions import WasataNotImplemented
 from sqlalchemy import CHAR, TypeDecorator
 from sqlalchemy.dialects.postgresql import UUID
 

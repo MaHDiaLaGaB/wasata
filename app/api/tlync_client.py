@@ -1,5 +1,5 @@
 import requests
-from app.core.config import config
+from core.config import config
 import json
 
 

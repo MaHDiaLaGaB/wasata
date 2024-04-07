@@ -4,13 +4,15 @@ import './AddressForm.scss'
 import axios from 'axios';
 
 const AddressForm = () => {
-  const { register, handleSubmit, formState: { errors }, reset } = useForm();
+  const { register, handleSubmit, formState: { errors }, setError, reset } = useForm();
   const [submitting, setSubmitting] = useState(false);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [backendErrors, setBackendErrors] = useState({});
 
   const onSubmit = async (data) => {
     setSubmitting(true);
-    const url = process.env.BACKEND_URL + '/api/v1/buy'; // replace YOUR_PORT with the actual port number
+    setBackendErrors({}); // Clear previous backend errors
+    const url = 'http://api:8080/api/v1/buy'; // replace with the actual URL
 
     const requestData = {
       phone_number: data.phone.toString(),
@@ -18,7 +20,7 @@ const AddressForm = () => {
     };
 
     const params = new URLSearchParams({
-      admin_username: 'osama', // replace with actual admin username
+      admin_username: process.env.ADMIN_USERNAME || "admin", // replace with actual admin username
       wallet_address: data.wallet // replace with actual wallet address
     });
 
@@ -27,12 +29,21 @@ const AddressForm = () => {
       console.log(response.data);
       setShowSuccessMessage(true);
       setSubmitting(false);
-      resetForm();
     } catch (error) {
       console.error('Error:', error);
-      setSubmitting(false);
+      if (error.response && error.response.data.errors) {
+        // Assuming the backend sends errors in a field called 'errors'
+        setBackendErrors(error.response.data.errors);
+        // Optionally set errors for react-hook-form if the names match
+        Object.keys(error.response.data.errors).forEach(key => {
+          setError(key, {
+            type: "manual",
+            message: error.response.data.errors[key]
+          });
+        });
+      }
     } finally {
-            setSubmitting(false);
+      setSubmitting(false);
     }
   };
 
@@ -52,6 +63,12 @@ const AddressForm = () => {
                   Your message has been sent successfully!
                 </div>
               )}
+              {/* Display backend errors */}
+              {Object.keys(backendErrors).map((key) => (
+                <div key={key} className="alert alert-danger" role="alert">
+                  {backendErrors[key]}
+                </div>
+              ))}
               <div className="mb-3">
                 <label htmlFor="phone" className="form-label">Phone number</label>
                 <input

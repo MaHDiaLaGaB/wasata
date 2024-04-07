@@ -1,7 +1,7 @@
 # type: ignore
 from dotenv import load_dotenv
 from .base_configuration import BaseConfig
-from app.core import generate_config
+from core import generate_config
 from typing import cast
 import os
 
@@ -35,7 +35,7 @@ class Config(BaseConfig):
     # Binance
     BINANCE_SECRETE_KEY = os.environ.get("BINANCE_SECRETE_KEY")
     BINANCE_API_KEY = os.environ.get("BINANCE_API_KEY")
-    BINANCE_BASE_URL = "https://api.binance.com"
+    BINANCE_BASE_URL = os.environ.get("BINANCE_BASE_URL")
     COIN = "USDT"
     BSCAN_API_KEY = os.environ.get("BSCAN_API_KEY")
 

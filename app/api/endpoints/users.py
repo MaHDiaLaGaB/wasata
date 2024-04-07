@@ -3,29 +3,31 @@ import uuid
 
 from fastapi import APIRouter, status, Depends, HTTPException, Body, Query
 from .routes import BUY
-from app.db.schemas import UserCreate, UserGet, StatusEntity
-from app.db.sessions import AdminRepository
+from db.schemas import UserCreate, UserGet, StatusEntity
+from db.sessions import AdminRepository
 from http import HTTPStatus
-from app.core.config import config
-from app.services.user_bl import UserBL
-from app.services.wallet import wallet_validator
-from app.api.binance_client import BinanceWa
-from app.api.tlync_client import TlyncClient
-from app.exceptions import BadRequest, AdminTokenRunOut, Conflict, ObjectNotFound
+from core.config import config
+from services.user_bl import UserBL
+from services.wallet import wallet_validator
+from api.binance_client import BinanceWa
+from api.tlync_client import TlyncClient
+from cus_exceptions import BadRequest, AdminTokenRunOut, Conflict, ObjectNotFound
 
 logger = logging.getLogger(__name__)
 
 route = APIRouter(tags=["users"])
 
 
-def validate_user_request(user: UserCreate):
+async def validate_user_request(user: UserCreate):
+    logger.info("validating the user request ...")
     if user.user_status == StatusEntity.ACTIVE:
         raise Conflict(description="Duplicate request detected.")
     if user.tokens <= 0:
         raise ValueError("Token amount must be greater than 0")
 
 
-def check_binance_connection(binance_end: BinanceWa):
+async def check_binance_connection(binance_end: BinanceWa):
+    logger.info("Binance connection checking ...")
     if not binance_end.check_connection():
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -33,14 +35,16 @@ def check_binance_connection(binance_end: BinanceWa):
         )
 
 
-def validate_wallet_address(wallet_address: str):
-    if not wallet_validator(wallet_address=wallet_address):
+async def validate_wallet_address(wallet_address: str):
+    logger.info("Validating the wallet address ...")
+    if not await wallet_validator(wallet_address=wallet_address):
         raise BadRequest(
             description="Invalid wallet address. Please check the steps and provide a valid BNB wallet address."
         )
 
 
-def calculate_usdt_price(admin_repository: AdminRepository, admin_username: str, tokens: float) -> float:
+async def calculate_usdt_price(admin_repository: AdminRepository, admin_username: str, tokens: float) -> float:
+    logger.info("Calculating the USDT price ...")
     try:
         usdt_price = admin_repository.get_admin_usdt_price_by_username(admin_username)
     except ObjectNotFound:
@@ -50,7 +54,7 @@ def calculate_usdt_price(admin_repository: AdminRepository, admin_username: str,
     return float(usdt_price) * tokens
 
 
-def process_user_payment(
+async def process_user_payment(
     user: UserCreate, binance_end: BinanceWa, tlync_end: TlyncClient,
     admin_repository: AdminRepository, admin_username: str, wallet_address: str
 ):
@@ -59,11 +63,11 @@ def process_user_payment(
         raise BadRequest(description="The Binance account is not active.")
 
     # Calculate and set the user's price based on admin's USDT price
-    user.price = calculate_usdt_price(admin_repository, admin_username, user.tokens)
+    user.price = await calculate_usdt_price(admin_repository, admin_username, user.tokens)
 
     total_price = user.tokens * float(user.price)
     user.invoice_id = uuid.uuid4()
-
+    logger.info(f"the wallet address id: {wallet_address}")
     tlync_response = tlync_end.initiate_payment(
         store_id=config.TLINC_STORE_ID,
         backend_url="http://localhost:8080",
@@ -78,7 +82,7 @@ def process_user_payment(
 # Dependency provider function
 def get_payment_api():
     tlync_end = TlyncClient(is_test_environment=True)
-    tlync_end.set_token("your-access-token-here")
+    tlync_end.set_token(config.TLYNC_TOKEN)
     return tlync_end
 
 
@@ -94,11 +98,11 @@ async def create_user_purchase(
         wallet_address: str = Query(),
 ) -> UserGet:
     try:
-        validate_user_request(user)
-        check_binance_connection(binance_end)
-        validate_wallet_address(wallet_address)
+        await validate_user_request(user)
+        await check_binance_connection(binance_end)
+        await validate_wallet_address(wallet_address)
         user.user_status = StatusEntity.ACTIVE
-        process_user_payment(user, binance_end, tlync_end, admin_repository, admin_username, wallet_address)
+        await process_user_payment(user, binance_end, tlync_end, admin_repository, admin_username, wallet_address)
     except (Conflict, BadRequest, AdminTokenRunOut, ValueError) as e:
         logger.error(f"Error processing user purchase: {e.description}")
         raise HTTPException(status_code=e.status_code, detail=e.description)
@@ -107,7 +111,7 @@ async def create_user_purchase(
         raise HTTPException(status_code=HTTPStatus.INTERNAL_SERVER_ERROR, detail="Unexpected error occurred")
 
     logger.info("User purchase processed successfully")
-    user.price = calculate_usdt_price(admin_repository, admin_username, user.tokens)
+    user.price = await calculate_usdt_price(admin_repository, admin_username, user.tokens)
     user.user_status = StatusEntity.INACTIVE
     created_user = user_bl.create_user(user)
     return created_user

@@ -83,6 +83,12 @@ class AdminCreate(BaseModel):
     usdt_price: float
 
 
+class Admins(BaseModel):
+    username: str
+    usdt_price: float
+    api_secret_key: str
+
+
 class AdminUpdate(BaseModel):
     usdt_price: float | None
 

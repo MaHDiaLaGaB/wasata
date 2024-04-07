@@ -2,7 +2,7 @@ from fastapi import APIRouter, Body
 from mailjet_rest import Client
 # from fastapi_mail import FastMail, MessageSchema, ConnectionConfig
 import logging
-from app.core.config import config
+from core.config import config
 from pydantic import EmailStr, BaseModel
 import smtplib
 from email.mime.multipart import MIMEMultipart

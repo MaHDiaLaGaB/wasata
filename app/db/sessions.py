@@ -8,7 +8,7 @@ from .models import Users, UsersBase, Admins
 from .schemas import UserCreate, WasataBase, AdminCreate, UserUpdate, AdminUpdate
 from fastapi import Depends
 from sqlalchemy.types import Numeric
-from app.exceptions import ObjectNotFound
+from cus_exceptions import ObjectNotFound
 import logging
 from .database_engine import UserDB, get_user_db
 from typing import TypeVar, Type, cast, Union, Dict

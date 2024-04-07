@@ -1,9 +1,9 @@
 import logging
 from fastapi import Depends
-from app.db.models import Admins
-from app.db.sessions import AdminRepository
-from app.db.schemas import AdminCreate, AdminUpdate
-from app.exceptions import Forbidden
+from db.models import Admins
+from db.sessions import AdminRepository
+from db.schemas import AdminCreate, AdminUpdate
+from cus_exceptions import Forbidden
 
 
 class AdminBL:

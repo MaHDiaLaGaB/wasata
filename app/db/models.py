@@ -7,7 +7,7 @@ import uuid
 from dotenv import load_dotenv
 from typing import Dict, Any
 from cryptography.fernet import Fernet
-from app.type import GUID
+from type import GUID
 from sqlalchemy.orm import registry, relationship
 from sqlalchemy import Column, String, DateTime, Numeric, BigInteger, ForeignKey
 import secrets
@@ -15,7 +15,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 from datetime import datetime
 
-from app.core.config import config
+from core.config import config
 
 load_dotenv()
 
@@ -60,8 +60,8 @@ class Admins(UsersBase):  # type: ignore
 
     id = Column(GUID, primary_key=True, unique=True, default=uuid.uuid4)
     username = Column(String(64), index=True, unique=True)
-    _password_hash = Column("password_hash", String(128))
-    api_secret_key = Column(String(128))
+    _password_hash = Column("password_hash", String(256))
+    api_secret_key = Column(String(256))
     usdt_price = Column(Numeric())
 
     users = relationship("Users", back_populates="admin")
