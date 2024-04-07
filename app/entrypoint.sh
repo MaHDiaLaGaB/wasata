@@ -31,4 +31,4 @@ execute_alembic_command() {
 execute_alembic_command "alembic -c alembic.ini upgrade head"
 
 # Start the server
-uvicorn app.server:app --host 0.0.0.0 --port "${WASATA_PORT}" --reload
+uvicorn server:app --host 0.0.0.0 --port "${WASATA_PORT}" --reload

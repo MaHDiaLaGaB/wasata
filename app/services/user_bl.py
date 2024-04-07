@@ -1,11 +1,11 @@
 import logging
 
 from fastapi import Depends
-from app.core.config import config
-from app.db.models import Users
+from core.config import config
+from db.models import Users
 
-from app.db.schemas import UserCreate, UserUpdate
-from app.db.sessions import UserRepository
+from db.schemas import UserCreate, UserUpdate
+from db.sessions import UserRepository
 
 logger = logging.getLogger(__name__)
 

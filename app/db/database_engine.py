@@ -6,7 +6,7 @@ from typing import Any, Callable, TypeVar, cast
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 from .models import users_mapper_registry
-from app.core.config import config
+from core.config import config
 
 TDecorated = TypeVar("TDecorated", bound=Callable[..., Any])  # pylint: disable=C0103
 

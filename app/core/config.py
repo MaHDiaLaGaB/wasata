@@ -1,7 +1,7 @@
 # type: ignore
 from dotenv import load_dotenv
 from .base_configuration import BaseConfig
-from app.core import generate_config
+from core import generate_config
 from typing import cast
 import os
 
@@ -11,7 +11,7 @@ load_dotenv()
 class Config(BaseConfig):
     NAME = "FastAPI"
     VERSION = "V1"
-    ENV = os.environ.get("ENV", "test")
+    ENV = os.environ.get("ENVIRONMENT", "test")
     WASATA_PORT = 8080
     ADMIN_USERNAME = "admin"
     ADMIN_PASSWORD = "password"
@@ -35,7 +35,7 @@ class Config(BaseConfig):
     # Binance
     BINANCE_SECRETE_KEY = os.environ.get("BINANCE_SECRETE_KEY")
     BINANCE_API_KEY = os.environ.get("BINANCE_API_KEY")
-    BINANCE_BASE_URL = "https://api.binance.com"
+    BINANCE_BASE_URL = os.environ.get("BINANCE_BASE_URL")
     COIN = "USDT"
     BSCAN_API_KEY = os.environ.get("BSCAN_API_KEY")
 
@@ -43,6 +43,7 @@ class Config(BaseConfig):
     TLYNC_TEST_BASE_URL = os.environ.get("TLYNC_TEST_BASE_URL")
     TLYNC_BASE_URL = os.environ.get("TLYNC_BASE_URL")
     TLYNC_TOKEN = os.environ.get("TLYNC_TOKEN")
+    TLYNC_STORE_ID = os.environ.get("TLYNC_STORE_ID")
 
 
 config = cast(Config, generate_config(Config))  # pylint: disable=C0103
@@ -63,5 +64,9 @@ config.BINANCE_API_KEY = config.BINANCE_API_KEY
 config.BSCAN_API_KEY = config.BSCAN_API_KEY
 config.MJ_APIKEY_PUBLIC = config.MJ_APIKEY_PUBLIC
 config.MJ_APIKEY_PRIVATE = config.MJ_APIKEY_PRIVATE
+config.TLYNC_BASE_URL = config.TLYNC_BASE_URL
+config.TLYNC_TOKEN = config.TLYNC_TOKEN
+config.TLYNC_STORE_ID = config.TLYNC_STORE_ID
+config.TLYNC_TEST_BASE_URL = config.TLYNC_TEST_BASE_URL
 
 config = Config()

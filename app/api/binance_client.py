@@ -6,9 +6,9 @@ import traceback
 import logging
 from typing import Dict, Any
 from binance.spot import Spot as Client
-from app.core.config import config
+from core.config import config
 from binance.error import ClientError
-from app.exceptions import ServiceUnavailable, BadRequest
+from cus_exceptions import ServiceUnavailable, BadRequest
 
 logger = logging.getLogger(__name__)
 

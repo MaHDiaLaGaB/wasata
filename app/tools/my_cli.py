@@ -7,12 +7,6 @@ from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptography.hazmat.backends import default_backend
 
 
-@click.command()
-@click.option(
-    "--admin-password",
-    prompt="Please enter your password to create Admin Key",
-    help="Password to generate the admin key.",
-)
 def generate_secret_key(admin_password: str) -> str:
     """Generate an admin key based on the provided password."""
 
@@ -32,10 +26,20 @@ def generate_secret_key(admin_password: str) -> str:
     return admin_secret_fernet_instance
 
 
-if __name__ == "__main__":
+@click.command()
+@click.option(
+    "--admin-password",
+    prompt="Please enter your password to create Admin Key",
+    help="Password to generate the admin key.",
+)
+def main(admin_password: str):
+    """Command-line interface for generating an admin key."""
+    admin_key = generate_secret_key(admin_password)
     click.echo("=========== Create Admin Key ===========")
-    admin_key = generate_secret_key()
     click.echo("============ Your Admin Key ============")
     click.secho(f"Your admin key ----> {admin_key} <----", fg="red", bold=True)
-    print(admin_key)
     click.echo("==== Keep your admin key safe please ===")
+
+
+if __name__ == "__main__":
+    main()

@@ -1,5 +1,5 @@
 import requests
-from app.core.config import config
+from core.config import config
 import json
 
 
@@ -30,12 +30,11 @@ class TlyncClient:
         except requests.exceptions.HTTPError as err:
             return {"error": str(err), "response": err.response.json()}
 
-    def initiate_payment(self, store_id, amount, phone, email, backend_url, frontend_url, custom_ref):
+    def initiate_payment(self, store_id, amount, phone, backend_url, frontend_url, custom_ref):
         data = {
             "id": store_id,
             "amount": amount,
             "phone": phone,
-            "email": email,
             "backend_url": backend_url,
             "frontend_url": frontend_url,
             "custom_ref": custom_ref

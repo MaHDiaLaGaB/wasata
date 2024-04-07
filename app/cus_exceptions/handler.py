@@ -4,8 +4,8 @@ from typing import Any, Dict, cast
 
 from fastapi.responses import JSONResponse
 
-from app.core.base_configuration import BaseConfig
-from app.core.reporting import report_exception
+from core.base_configuration import BaseConfig
+from core.reporting import report_exception
 
 from .exception import WasataException
 from .registry import KNOWN_EXCEPTIONS

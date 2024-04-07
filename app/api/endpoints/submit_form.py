@@ -2,10 +2,11 @@ from fastapi import APIRouter, Body
 from mailjet_rest import Client
 # from fastapi_mail import FastMail, MessageSchema, ConnectionConfig
 import logging
-from app.core.config import config
+from core.config import config
 from pydantic import EmailStr, BaseModel
 import smtplib
 from email.mime.multipart import MIMEMultipart
+from .routes import SUBMIT_FORM, CONTACTS
 from email.mime.text import MIMEText
 
 logger = logging.getLogger(__name__)
@@ -27,7 +28,7 @@ class ContactForm(BaseModel):
 
 
 # create email message
-@route.post('/send_email')
+@route.post(SUBMIT_FORM)
 async def send_email(form: ContactForm = Body()):
     # configure emailjet client
     api_key = config.MJ_APIKEY_PUBLIC
@@ -91,7 +92,7 @@ def send_to_my_email(name, email, message, phone_number):
     server.quit()
 
 
-@route.post("/contact")
+@route.post(CONTACTS)
 async def contact(form: ContactForm):
     send_to_my_email(form.name, form.email, form.message, form.phone_number)
     return {"message": "Email sent successfully"}

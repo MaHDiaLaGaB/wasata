@@ -1,4 +1,5 @@
 import secrets
+import logging
 from typing import AsyncGenerator, Dict, Any
 
 from fastapi import FastAPI, Depends, Request
@@ -9,13 +10,13 @@ from fastapi.openapi.utils import get_openapi
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.responses import HTMLResponse
 
-from app.api.endpoints import health, users, admin, routes, submit_form
-from app.core.logg import setup_logging
-from app.core.config import config
-from app.db.database_engine import UserDB, get_user_db
-from app.exceptions.exception import WasataException
-from app.exceptions.handler import handle_exception
-from app.exceptions import Unauthorized, Forbidden
+from api.endpoints import health, users, admin, routes, submit_form
+from core.logg import setup_logging
+from core.config import config
+from db.database_engine import UserDB, get_user_db
+from cus_exceptions.exception import WasataException
+from cus_exceptions.handler import handle_exception
+from cus_exceptions import Unauthorized, Forbidden
 
 
 async def start_user_db_session(
@@ -34,8 +35,6 @@ app = FastAPI(
     dependencies=[Depends(start_user_db_session)],
 )
 security = HTTPBasic()
-
-setup_logging()
 
 
 def get_current_username(credentials: HTTPBasicCredentials = Depends(security)) -> str:
@@ -104,7 +103,18 @@ async def openapi(username: str = Depends(get_current_username)) -> Dict[str, An
     return get_openapi(title=config.NAME, version=config.VERSION, routes=app.routes)
 
 
+# @app.post("/api/v1/admin")
+# async def your_endpoint(request: Request):
+#     try:
+#         request_json = await request.json()  # This gets the parsed JSON body
+#         logging.debug(f"Received request JSON: {request_json}")
+#         # Your endpoint logic here
+#     except Exception as e:
+#         logging.error(f"Error processing request: {e}")
+
+
 if config.ENV == "dev" and __name__ == "__main__":
     import uvicorn
 
+    setup_logging()
     uvicorn.run(app=app, host="0.0.0.0", port=config.WASATA_PORT)
